@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Cogmura
+Comment=A Paper Mario-inspired RPG
+MimeType=application/x-love-game;
+Exec=cogmura %f
+Type=Application
+Categories=Game;
+Terminal=false
+Icon=cogmura
+NoDisplay=true
+Name[pt_BR]=cogmura.desktop
