@@ -1,10 +1,12 @@
 require("src.game")
 
 function love.load()
+  Window.init()
   Game.load()
 end
 
 function love.update(dt)
+  Mouse.update()
   Game.update()
 end
 
