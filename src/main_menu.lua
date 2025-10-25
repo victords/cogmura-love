@@ -6,7 +6,9 @@ function MainMenu.new()
 
   local font = Res.font("font", 24)
   self.buttons = {
-    Button.new(0, -65, {w = 150, h = 30, font = font, text = "Play", anchor = "center"}),
+    Button.new(0, -65, {w = 150, h = 30, font = font, text = "Play", anchor = "center"}, function()
+      EventManager.trigger("game_start")
+    end),
     Button.new(0, -15, {w = 150, h = 30, font = font, text = "Options", anchor = "center"}),
     Button.new(0, 35, {w = 150, h = 30, font = font, text = "Exit", anchor = "center"}),
   }
