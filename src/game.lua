@@ -1,11 +1,14 @@
 require("lib.index")
 
 require("src.event_manager")
+require("src.in_game_ui")
 require("src.main_menu")
+require("src.player_stats")
 require("src.scene")
 
 Game = {
   load = function()
+    Game.player_stats = PlayerStats.load("10,5,1,0,0,0")
     Game.controllers = {
       MainMenu.new(),
     }
@@ -28,6 +31,7 @@ Game = {
   on_start = function()
     Game.controllers = {
       Scene.new(),
+      InGameUi.new(Game.player_stats)
     }
   end
 }
