@@ -4,6 +4,7 @@ Physics = {
   ramp_contact_threshold = 4,
   ramp_slip_threshold = 1,
   ramp_slip_force = 1,
+  epsilon = 0.001,
   engine = "minigl",
   setEngine = function(engine)
     if engine ~= "minigl" and engine ~= "love" then
