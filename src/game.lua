@@ -16,6 +16,13 @@ Game = {
     EventManager.listen("game_start", Game.on_start)
   end,
   update = function()
+    KB.update()
+    Mouse.update()
+
+    if KB.pressed("f4") then
+      Window.toggle_fullscreen()
+    end
+
     for _, controller in ipairs(Game.controllers) do
       controller:update()
     end

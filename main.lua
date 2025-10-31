@@ -1,12 +1,11 @@
 require("src.game")
 
 function love.load()
-  Window.init()
+  Window.init(false, 1280, 720, 1920, 1080)
   Game.load()
 end
 
 function love.update(dt)
-  Mouse.update()
   Game.update()
 end
 

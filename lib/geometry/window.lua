@@ -50,7 +50,7 @@ end
 
 function Window.toggle_fullscreen()
   local currently_fullscreen = love.window.getFullscreen()
-  Window.set_size(not currently_fullscreen, Window.width, Window.height, Window.reference_width, Window.reference_height)
+  Window.init(not currently_fullscreen, Window.width, Window.height, Window.reference_width, Window.reference_height)
 end
 
 function Window.set_shader(path)
