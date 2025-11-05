@@ -6,7 +6,7 @@ Physics = {
   ramp_slip_force = 1,
   epsilon = 0.001,
   engine = "minigl",
-  setEngine = function(engine)
+  set_engine = function(engine)
     if engine ~= "minigl" and engine ~= "love" then
       error("Unsupported physics engine '" .. engine .. "'")
     end

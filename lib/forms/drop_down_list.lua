@@ -84,11 +84,11 @@ function DropDownList:set_position(x, y)
   end
 end
 
-function DropDownList:draw(color)
+function DropDownList:draw(color, z_index)
   if not self.visible then return end
 
   for _, b in ipairs(self.buttons) do
-    b:draw(color)
+    b:draw(color, z_index)
   end
 end
 

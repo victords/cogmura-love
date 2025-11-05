@@ -28,7 +28,7 @@ function Label:set_text(text)
   end
 end
 
-function Label:draw(color)
+function Label:draw(color, z_index)
   if not self.visible then return end
 
   color = color or {1, 1, 1}
@@ -38,5 +38,5 @@ function Label:draw(color)
   c[2] = color[2] * base_color[2]
   c[3] = color[3] * base_color[3]
   c[4] = (color[4] or 1) * (self.color[4] or 1)
-  self.font:draw_text(self.text, self.x, self.y, c, self.scale)
+  self.font:draw_text(self.text, self.x, self.y, z_index, c, self.scale)
 end

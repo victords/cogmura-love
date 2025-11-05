@@ -10,11 +10,11 @@ function Font.new(path, size)
   return self
 end
 
-function Font:draw_text(text, x, y, color, scale)
-  self:draw_text_rel(text, x, y, 0, 0, color, scale)
+function Font:draw_text(text, x, y, z, color, scale)
+  self:draw_text_rel(text, x, y, z, 0, 0, color, scale)
 end
 
-function Font:draw_text_rel(text, x, y, rel_x, rel_y, color, scale)
+function Font:draw_text_rel(text, x, y, z, rel_x, rel_y, color, scale)
   rel_x = rel_x or 0
   rel_y = rel_y or 0
   scale = scale or 1
@@ -29,9 +29,8 @@ function Font:draw_text_rel(text, x, y, rel_x, rel_y, color, scale)
   elseif rel_y == 1 then
     y = Utils.round(y - scale * self.height)
   end
-  if color then love.graphics.setColor(color) end
-  love.graphics.print(text, self.source, x, y, nil, scale, scale)
-  if color then love.graphics.setColor(1, 1, 1) end
+
+  Window.draw_text(text, self.source, x, y, z, color, scale, scale)
 end
 
 function Font:text_width(text)

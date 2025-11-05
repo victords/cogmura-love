@@ -99,41 +99,41 @@ function Panel:add_component(c)
   table.insert(self.components, c)
 end
 
-function Panel:draw(color)
+function Panel:draw(color, z_index)
   if not self.visible then return end
 
   if self.tiled then
     -- corners
-    self.img[1]:draw(self.x, self.y, self.scale, self.scale, nil, color)
-    self.img[3]:draw(self.x + self.w - self.border_w, self.y, self.scale, self.scale, nil, color)
-    self.img[7]:draw(self.x, self.y + self.h - self.border_h, self.scale, self.scale, nil, color)
-    self.img[9]:draw(self.x + self.w - self.border_w, self.y + self.h - self.border_h, self.scale, self.scale, nil, color)
+    self.img[1]:draw(self.x, self.y, z_index, self.scale, self.scale, nil, color)
+    self.img[3]:draw(self.x + self.w - self.border_w, self.y, z_index, self.scale, self.scale, nil, color)
+    self.img[7]:draw(self.x, self.y + self.h - self.border_h, z_index, self.scale, self.scale, nil, color)
+    self.img[9]:draw(self.x + self.w - self.border_w, self.y + self.h - self.border_h, z_index, self.scale, self.scale, nil, color)
 
     -- horizontal middle
     if self.w > 2 * self.border_w then
-      self.img[2]:draw(self.x + self.border_w, self.y, self.center_scale_x, self.scale, nil, color)
-      self.img[8]:draw(self.x + self.border_w, self.y + self.h - self.border_h, self.center_scale_x, self.scale, nil, color)
+      self.img[2]:draw(self.x + self.border_w, self.y, z_index, self.center_scale_x, self.scale, nil, color)
+      self.img[8]:draw(self.x + self.border_w, self.y + self.h - self.border_h, z_index, self.center_scale_x, self.scale, nil, color)
 
       -- center
       if self.h > 2 * self.border_h then
-        self.img[5]:draw(self.x + self.border_w, self.y + self.border_h, self.center_scale_x, self.center_scale_y, nil, color)
+        self.img[5]:draw(self.x + self.border_w, self.y + self.border_h, z_index, self.center_scale_x, self.center_scale_y, nil, color)
       end
     end
 
     -- vertical middle
     if self.h > 2 * self.border_h then
-      self.img[4]:draw(self.x, self.y + self.border_h, self.scale, self.center_scale_y, nil, color)
-      self.img[6]:draw(self.x + self.w - self.border_w, self.y + self.border_h, self.scale, self.center_scale_y, nil, color)
+      self.img[4]:draw(self.x, self.y + self.border_h, z_index, self.scale, self.center_scale_y, nil, color)
+      self.img[6]:draw(self.x + self.w - self.border_w, self.y + self.border_h, z_index, self.scale, self.center_scale_y, nil, color)
     end
   elseif self.img then
-    self.img:draw(self.x, self.y, self.scale_x, self.scale_y, nil, color)
+    self.img:draw(self.x, self.y, z_index, self.scale_x, self.scale_y, nil, color)
   end
 
   if self.shader then
     love.graphics.setShader(self.shader)
   end
   for _, c in ipairs(self.components) do
-    c:draw(color)
+    c:draw(color, z_index)
   end
   if self.shader then
     love.graphics.setShader()

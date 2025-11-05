@@ -252,11 +252,11 @@ function TextField:set_position(x, y)
   end
 end
 
-function TextField:draw(color)
+function TextField:draw(color, z_index)
   if not self.visible then return end
 
   if self.img then
-    self.img[self.enabled and 1 or 2]:draw(self.x, self.y, self.scale, self.scale, nil, color)
+    self.img[self.enabled and 1 or 2]:draw(self.x, self.y, z_index, self.scale, self.scale, nil, color)
   else
     local rect_color = Utils.clone(color or {1, 1, 1})
     if not self.enabled then
@@ -264,26 +264,26 @@ function TextField:draw(color)
       rect_color[2] = rect_color[2] * 0.6
       rect_color[3] = rect_color[3] * 0.6
     end
-    Window.draw_rectangle(self.x, self.y, self.w, self.h, rect_color)
+    Window.draw_rectangle(self.x, self.y, z_index, self.w, self.h, rect_color)
   end
 
   if text ~= '' then
     local text_color = self.enabled and self.text_color or self.disabled_text_color
-    self.font:draw_text(self.text, self.text_x, self.text_y, text_color, self.scale)
+    self.font:draw_text(self.text, self.text_x, self.text_y, z_index, text_color, self.scale)
   end
 
   if self.anchor1 and self.anchor2 then
     local min = self.anchor1 < self.anchor2 and self.anchor1 or self.anchor2
     local max = min == self.anchor1 and self.anchor2 or self.anchor1
-    Window.draw_rectangle(self.nodes[min], self.text_y, self.nodes[max] - self.nodes[min], self.font.height * self.scale, self.selection_color)
+    Window.draw_rectangle(self.nodes[min], self.text_y, z_index, self.nodes[max] - self.nodes[min], self.font.height * self.scale, self.selection_color)
   end
 
   if self.cursor_visible then
     local cursor_x = self.nodes[self.cur_node]
     if self.cursor_img then
-      self.cursor_img:draw(cursor_x + self.cursor_img_gap.x, self.text_y + self.cursor_img_gap.y, self.scale, self.scale)
+      self.cursor_img:draw(cursor_x + self.cursor_img_gap.x, self.text_y + self.cursor_img_gap.y, z_index, self.scale, self.scale)
     else
-      Window.draw_rectangle(cursor_x, self.text_y, 1, self.font.height * self.scale, self.cursor_color)
+      Window.draw_rectangle(cursor_x, self.text_y, z_index, 1, self.font.height * self.scale, self.cursor_color)
     end
   end
 end

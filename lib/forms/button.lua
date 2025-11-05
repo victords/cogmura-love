@@ -84,7 +84,7 @@ function Button:update()
   end
 end
 
-function Button:draw(color)
+function Button:draw(color, z_index)
   if not self.visible then return end
 
   if self.img then
@@ -100,7 +100,7 @@ function Button:draw(color)
       rect_color[2] = rect_color[2] * 0.6
       rect_color[3] = rect_color[3] * 0.6
     end
-    Window.draw_rectangle(self.x, self.y, self.w, self.h, rect_color)
+    Window.draw_rectangle(self.x, self.y, z_index, self.w, self.h, rect_color)
   end
 
   if self.font == nil or self.text == nil or self.text == "" then return end
@@ -113,7 +113,7 @@ function Button:draw(color)
   else
     text_color = self.disabled_text_color
   end
-  self.font:draw_text_rel(self.text, self.text_x, self.text_y, rel_x, rel_y, text_color, self.scale)
+  self.font:draw_text_rel(self.text, self.text_x, self.text_y, z_index, rel_x, rel_y, text_color, self.scale)
 end
 
 function Button:set_position(x, y)

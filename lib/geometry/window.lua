@@ -1,6 +1,14 @@
 Window = {}
 Window.__index = Window
 
+local function add_to_layer(z, args)
+  z = z or 1
+  if Window.layers[z] == nil then
+    Window.layers[z] = {}
+  end
+  table.insert(Window.layers[z], args)
+end
+
 function Window.init(fullscreen, width, height, reference_width, reference_height)
   width = width or 1280
   height = height or 720
@@ -60,12 +68,30 @@ function Window.set_shader(path)
   end
 end
 
-function Window.draw_rectangle(x, y, w, h, color, mode)
-  color = color or {1, 1, 1}
+function Window.draw_rectangle(x, y, z, w, h, color, mode)
   mode = mode or "fill"
-  love.graphics.setColor(color)
-  love.graphics.rectangle(mode, x, y, w, h)
-  love.graphics.setColor(1, 1, 1)
+  add_to_layer(z, {"rectangle", color, mode, x, y, w, h})
+end
+
+function Window.draw_polygon(z, color, mode, ...)
+  mode = mode or "fill"
+  add_to_layer(z, {"polygon", color, mode, ...})
+end
+
+function Window.draw_circle(x, y, z, radius, color, mode)
+  mode = mode or "fill"
+  add_to_layer(z, {"circle", color, mode, x, y, radius})
+end
+
+function Window.draw_image(image, x, y, z, color, scale_x, scale_y, angle, origin_x, origin_y, quad)
+  local args = quad and
+    {"draw", color, image, quad, x, y, angle, scale_x, scale_y, origin_x, origin_y} or
+    {"draw", color, image, x, y, angle, scale_x, scale_y, origin_x, origin_y}
+  add_to_layer(z, args)
+end
+
+function Window.draw_text(text, font, x, y, z, color, scale_x, scale_y, angle, origin_x, origin_y)
+  add_to_layer(z, {"print", color, text, font, x, y, angle, scale_x, scale_y, origin_x, origin_y})
 end
 
 function Window.draw(draw_code)
@@ -74,7 +100,24 @@ function Window.draw(draw_code)
     love.graphics.clear()
   end
 
+  Window.layers = {}
   draw_code()
+
+  local indexes = {}
+  for index in pairs(Window.layers) do
+    table.insert(indexes, index)
+  end
+  table.sort(indexes)
+
+  for _, index in ipairs(indexes) do
+    layer = Window.layers[index]
+    for _, object in ipairs(layer) do
+      local color = object[2]
+      if color then love.graphics.setColor(color) end
+      love.graphics[object[1]](unpack(object, 3))
+      if color then love.graphics.setColor(1, 1, 1) end
+    end
+  end
 
   if Window.canvas then
     if Window.shader then love.graphics.setShader(Window.shader) end

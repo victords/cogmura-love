@@ -33,7 +33,7 @@ function GameObject.new(x, y, w, h, img_path, img_gap, cols, rows, physics_optio
   return self
 end
 
-function GameObject:draw(scale_x, scale_y, color, angle, flip, scale_img_gap, round)
+function GameObject:draw(scale_x, scale_y, color, angle, flip, z_index, scale_img_gap, round)
   if self.img == nil then return end
 
   scale_x = scale_x or 1
@@ -53,25 +53,20 @@ function GameObject:draw(scale_x, scale_y, color, angle, flip, scale_img_gap, ro
   end
   local scale_x_factor = flip == "horiz" and -1 or 1
   local scale_y_factor = flip == "vert" and -1 or 1
-  if color then love.graphics.setColor(color) end
-  love.graphics.draw(self.img.source, self.quads[self.img_index], x, y, angle, scale_x_factor * scale_x, scale_y_factor * scale_y, origin_x, origin_y)
-  if color then love.graphics.setColor(1, 1, 1) end
+
+  Window.draw_image(self.img.source, x, y, z_index, color, scale_x_factor * scale_x, scale_y_factor * scale_y, angle, origin_x, origin_y, self.quads[self.img_index])
 end
 
-function GameObject:draw_shape(color)
-  if color then love.graphics.setColor(color) end
-
+function GameObject:draw_shape(color, z_index)
   if Physics.engine == "love" then
     if self.shape_type == "circle" then
-      love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.w / 2)
+      Window.draw_circle(self.body:getX(), self.body:getY(), z_index, self.w / 2, color)
     else
-      love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
+      Window.draw_polygon(z_index, color, "fill", self.body:getWorldPoints(self.shape:getPoints()))
     end
   else
-    love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
+    Window.draw_rectangle(self.x, self.y, z_index, self.w, self.h, color)
   end
-
-  if color then love.graphics.setColor(1, 1, 1) end
 end
 
 function GameObject:bounds()
