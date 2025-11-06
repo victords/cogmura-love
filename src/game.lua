@@ -8,6 +8,9 @@ require("src.scene")
 
 Game = {
   load = function()
+    Window.init(false, 1280, 720, 1920, 1080)
+    Physics.set_engine("love")
+
     Game.player_stats = PlayerStats.load("10,5,1,0,0,0")
     Game.controllers = {
       MainMenu.new(),
@@ -15,9 +18,10 @@ Game = {
 
     EventManager.listen("game_start", Game.on_start)
   end,
-  update = function()
+  update = function(dt)
     KB.update()
     Mouse.update()
+    Physics.update(dt)
 
     if KB.pressed("f4") then
       Window.toggle_fullscreen()
@@ -28,9 +32,11 @@ Game = {
     end
   end,
   draw = function()
-    for _, controller in ipairs(Game.controllers) do
-      controller:draw()
-    end
+    Window.draw(function ()
+      for _, controller in ipairs(Game.controllers) do
+        controller:draw()
+      end
+    end)
   end,
   toggle_gamepad = function(enabled)
     print("gamepad " .. (enabled and "enabled" or "disabled"))

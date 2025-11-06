@@ -31,21 +31,21 @@ function Ramp.new(x, y, w, h, left, inverted)
     self.factor = w / math.sqrt(w^2 + h^2)
   elseif Physics.engine == "love" then
     self.body = love.physics.newBody(Physics.world, x + w / 2, y + h / 2)
-    points = {}
-    if not left or inverted then
-      table.insert(points, -w / 2)
-      table.insert(points, -h / 2)
-    end
+    local points = {}
     if left or inverted then
       table.insert(points, w / 2)
       table.insert(points, -h / 2)
     end
-    if not (left and inverted) then
+    if not left or inverted then
       table.insert(points, -w / 2)
-      table.insert(points, h / 2)
+      table.insert(points, -h / 2)
     end
     if left or not inverted then
       table.insert(points, w / 2)
+      table.insert(points, h / 2)
+    end
+    if not left or not inverted then
+      table.insert(points, -w / 2)
       table.insert(points, h / 2)
     end
     self.shape = love.physics.newPolygonShape(unpack(points))

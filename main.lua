@@ -1,18 +1,15 @@
 require("src.game")
 
 function love.load()
-  Window.init(false, 1280, 720, 1920, 1080)
   Game.load()
 end
 
 function love.update(dt)
-  Game.update()
+  Game.update(dt)
 end
 
 function love.draw()
-  Window.draw(function ()
-    Game.draw()
-  end)
+  Game.draw()
 end
 
 function love.joystickadded()
