@@ -1,4 +1,5 @@
 require("src.constants")
+require("src.player_character")
 
 Scene = {}
 Scene.__index = Scene
@@ -25,7 +26,7 @@ end
 function Scene.new()
   local self = setmetatable({}, Scene)
 
-  self.map = Map.new(96, 48, 20, 20, Window.reference_width, Window.reference_height, true, false)
+  self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, 20, 20, Window.reference_width, Window.reference_height, true, false)
   self.blocks = {
     new_block(0, 0),
     new_block(1, 0),
@@ -38,33 +39,13 @@ function Scene.new()
     new_ramp(0, 8, false, false),
     new_ramp(8, 8, true, false)
   }
-  self.man = GameObject.new(5.5 * PHYSICS_UNIT - 6, 5.5 * PHYSICS_UNIT - 6, 12, 12, nil, nil, nil, nil, {shape = "circle"})
+  self.player_character = PlayerCharacter.new(5, 5)
 
   return self
 end
 
 function Scene:update()
-  local speed = Vector.new()
-  local up = KB.down("up")
-  local rt = KB.down("right")
-  local dn = KB.down("down")
-  local lf = KB.down("left")
-
-  if up then
-    if rt then speed.x = 0; speed.y = -50
-    elseif lf then speed.x = -50; speed.y = 0
-    else speed.x = -35; speed.y = -35
-    end
-  elseif dn then
-    if rt then speed.x = 50; speed.y = 0
-    elseif lf then speed.x = 0; speed.y = 50
-    else speed.x = 35; speed.y = 35
-    end
-  elseif rt then speed.x = 35; speed.y = -35
-  elseif lf then speed.x = -35; speed.y = 35
-  end
-
-  self.man:move(speed, self.blocks, nil, true)
+  self.player_character:update()
 end
 
 function Scene:draw()
@@ -100,15 +81,5 @@ function Scene:draw()
     love.graphics.polygon("fill", unpack(points))
   end
 
-  local man_col = math.floor(self.man:get_x() / PHYSICS_UNIT)
-  local man_row = math.floor(self.man:get_y() / PHYSICS_UNIT)
-  local man_offset_x = self.man:get_x() - man_col * PHYSICS_UNIT
-  local man_offset_y = self.man:get_y() - man_row * PHYSICS_UNIT
-  local man_base_pos = self.map:get_screen_pos(man_col, man_row)
-  local man_x = man_base_pos.x + 48 * (1 + (man_offset_x / PHYSICS_UNIT) - (man_offset_y / PHYSICS_UNIT))
-  local man_y = man_base_pos.y + 24 * ((man_offset_x / PHYSICS_UNIT) + (man_offset_y / PHYSICS_UNIT))
-  love.graphics.setColor(0.3, 0.3, 1)
-  love.graphics.circle("fill", man_x, man_y, self.man.w / 2)
-
-  love.graphics.setColor(1, 1, 1)
+  self.player_character:draw(self.map)
 end

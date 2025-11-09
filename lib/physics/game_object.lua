@@ -100,9 +100,11 @@ end
 
 function GameObject:move(forces, obst, ramps, set_speed)
   if Physics.engine == "love" then
-    for _, obj in ipairs(obst) do
-      if obj.passable then
-        obj.body:setActive(self.body:getY() + self.h / 2 <= obj.y)
+    if obst then
+      for _, obj in ipairs(obst) do
+        if obj.passable then
+          obj.body:setActive(self.body:getY() + self.h / 2 <= obj.y)
+        end
       end
     end
 
