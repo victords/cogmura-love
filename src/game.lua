@@ -9,6 +9,7 @@ require("src.scene")
 Game = {
   load = function()
     Window.init(false, 1280, 720, 1920, 1080)
+    Physics.gravity.y = 0
     Physics.set_engine("love")
 
     Game.player_stats = PlayerStats.load("10,5,1,0,0,0")

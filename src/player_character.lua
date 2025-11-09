@@ -39,7 +39,7 @@ function PlayerCharacter:draw(map)
   local offset_x = x - col * PHYSICS_UNIT
   local offset_y = y - row * PHYSICS_UNIT
   local base_pos = map:get_screen_pos(col, row)
-  local screen_x = base_pos.x + 48 * (1 + (offset_x / PHYSICS_UNIT) - (offset_y / PHYSICS_UNIT))
-  local screen_y = base_pos.y + 24 * ((offset_x / PHYSICS_UNIT) + (offset_y / PHYSICS_UNIT))
-  Window.draw_circle(screen_x, screen_y, 1, 12, {0.3, 0.3, 1})
+  local screen_x = base_pos.x + HALF_TILE_WIDTH * (1 + (offset_x / PHYSICS_UNIT) - (offset_y / PHYSICS_UNIT))
+  local screen_y = base_pos.y + HALF_TILE_HEIGHT * ((offset_x / PHYSICS_UNIT) + (offset_y / PHYSICS_UNIT))
+  Window.draw_circle(screen_x, screen_y, screen_y * 100, 16, {0.3, 0.3, 1})
 end
