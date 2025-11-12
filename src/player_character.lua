@@ -1,8 +1,11 @@
 PlayerCharacter = setmetatable({}, GameObject)
 PlayerCharacter.__index = PlayerCharacter
 
+BASE_SPEED = 1.5 * ISO_UNIT -- move 2 tiles per second
+DIAGONAL_SPEED = BASE_SPEED * math.sqrt(2) * 0.5
+
 function PlayerCharacter.new(col, row)
-  local self = GameObject.new((col + 0.5) * PHYSICS_UNIT - 6, (row + 0.5) * PHYSICS_UNIT - 6, 12, 12, nil, nil, nil, nil, {shape = "circle"})
+  local self = GameObject.new((col + 0.5) * PHYSICS_UNIT - 6, (row + 0.5) * PHYSICS_UNIT - 6, 12, 12, "sprite/player", nil, nil, nil, {shape = "circle"})
   setmetatable(self, PlayerCharacter)
   return self
 end
@@ -15,17 +18,17 @@ function PlayerCharacter:update()
   local lf = KB.down("left")
 
   if up then
-    if rt then speed.x = 0; speed.y = -50
-    elseif lf then speed.x = -50; speed.y = 0
-    else speed.x = -35; speed.y = -35
+    if rt then speed.x = 0; speed.y = -BASE_SPEED
+    elseif lf then speed.x = -BASE_SPEED; speed.y = 0
+    else speed.x = -DIAGONAL_SPEED; speed.y = -DIAGONAL_SPEED
     end
   elseif dn then
-    if rt then speed.x = 50; speed.y = 0
-    elseif lf then speed.x = 0; speed.y = 50
-    else speed.x = 35; speed.y = 35
+    if rt then speed.x = BASE_SPEED; speed.y = 0
+    elseif lf then speed.x = 0; speed.y = BASE_SPEED
+    else speed.x = DIAGONAL_SPEED; speed.y = DIAGONAL_SPEED
     end
-  elseif rt then speed.x = 35; speed.y = -35
-  elseif lf then speed.x = -35; speed.y = 35
+  elseif rt then speed.x = DIAGONAL_SPEED; speed.y = -DIAGONAL_SPEED
+  elseif lf then speed.x = -DIAGONAL_SPEED; speed.y = DIAGONAL_SPEED
   end
 
   self:move(speed, nil, nil, true)
@@ -41,5 +44,5 @@ function PlayerCharacter:draw(map)
   local base_pos = map:get_screen_pos(col, row)
   local screen_x = base_pos.x + HALF_TILE_WIDTH * (1 + (offset_x / PHYSICS_UNIT) - (offset_y / PHYSICS_UNIT))
   local screen_y = base_pos.y + HALF_TILE_HEIGHT * ((offset_x / PHYSICS_UNIT) + (offset_y / PHYSICS_UNIT))
-  Window.draw_circle(screen_x, screen_y, screen_y * 100, 16, {0.3, 0.3, 1})
+  self.img:draw(Utils.round(screen_x - self.img.width / 2), Utils.round(screen_y - ISO_UNIT - 8), (col + row + 2) * HALF_TILE_HEIGHT * 100)
 end

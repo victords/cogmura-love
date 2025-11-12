@@ -84,6 +84,7 @@ function Window.draw_circle(x, y, z, radius, color, mode)
 end
 
 function Window.draw_image(image, x, y, z, color, scale_x, scale_y, angle, origin_x, origin_y, quad)
+  color = color or {1, 1, 1}
   local args = quad and
     {"draw", color, image, quad, x, y, angle, scale_x, scale_y, origin_x, origin_y} or
     {"draw", color, image, x, y, angle, scale_x, scale_y, origin_x, origin_y}
