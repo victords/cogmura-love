@@ -1,12 +1,14 @@
 PlayerCharacter = setmetatable({}, GameObject)
 PlayerCharacter.__index = PlayerCharacter
 
-BASE_SPEED = 1.5 * ISO_UNIT -- move 2 tiles per second
+BASE_SPEED = 3 * PHYSICS_UNIT -- move 3 tiles per second
 DIAGONAL_SPEED = BASE_SPEED * math.sqrt(2) * 0.5
 
-function PlayerCharacter.new(col, row)
+function PlayerCharacter.new(col, row, layer)
   local self = GameObject.new((col + 0.5) * PHYSICS_UNIT - 6, (row + 0.5) * PHYSICS_UNIT - 6, 12, 12, "sprite/player", nil, nil, nil, {shape = "circle"})
   setmetatable(self, PlayerCharacter)
+  self.z = layer * PHYSICS_UNIT
+  self.height = PHYSICS_UNIT
   return self
 end
 
@@ -31,7 +33,11 @@ function PlayerCharacter:update()
   elseif lf then speed.x = -DIAGONAL_SPEED; speed.y = DIAGONAL_SPEED
   end
 
+  local layer = math.floor(self.z / PHYSICS_UNIT)
+  EventManager.trigger("player_move_start", layer)
   self:move(speed, nil, nil, true)
+
+  -- TODO z-axis movement
 end
 
 function PlayerCharacter:draw(map)

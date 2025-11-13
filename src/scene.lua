@@ -34,9 +34,17 @@ function Scene.new()
     new_ramp(0, 8, false, false),
     new_ramp(8, 8, true, false)
   }
-  self.player_character = PlayerCharacter.new(5, 5)
+  self.player_character = PlayerCharacter.new(5, 5, 0)
+
+  EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
 
   return self
+end
+
+function Scene:prepare_obstacles(layer)
+  for _, block in ipairs(self.blocks) do
+    block.body:setActive(block.layer == layer)
+  end
 end
 
 function Scene:update()

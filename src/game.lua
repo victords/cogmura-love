@@ -31,6 +31,8 @@ Game = {
     for _, controller in ipairs(Game.controllers) do
       controller:update()
     end
+
+    --print(love.timer.getFPS())
   end,
   draw = function()
     Window.draw(function ()
