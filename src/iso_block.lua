@@ -10,11 +10,6 @@ function IsoBlock.new(col, row, layer, cols, rows, height)
   self.rows = rows
   self.height = height
 
-  -- z_index calculated based on the bottom-most corner of the block;
-  -- each increment in col/row corresponds to HALF_TILE_HEIGHT pixels;
-  -- each pixel row allows for 100 layers.
-  self.z_index = (col + row + cols + rows) * HALF_TILE_HEIGHT * 100 + layer
-
   self.body = love.physics.newBody(Physics.world, (col + cols / 2) * PHYSICS_UNIT, (row + rows / 2) * PHYSICS_UNIT)
   self.shape = love.physics.newRectangleShape(cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
   love.physics.newFixture(self.body, self.shape)
@@ -31,19 +26,19 @@ function IsoBlock:draw(map)
   local base_pos = map:get_screen_pos(self.col, self.row + self.rows - 1)
   local bottom_y = base_pos.y + HALF_TILE_HEIGHT - self.layer * ISO_UNIT
   local top_y = bottom_y - self.height * ISO_UNIT
-  Window.draw_polygon(self.z_index, {1, 1, 1}, "fill",
-                      base_pos.x, top_y,
-                      base_pos.x + self.rows * HALF_TILE_WIDTH, top_y - self.rows * HALF_TILE_HEIGHT,
-                      base_pos.x + (self.cols + self.rows) * HALF_TILE_WIDTH, top_y + (self.cols - self.rows) * HALF_TILE_HEIGHT,
-                      base_pos.x + self.cols * HALF_TILE_WIDTH, top_y + self.cols * HALF_TILE_HEIGHT)
-  Window.draw_polygon(self.z_index, {0.9, 0.9, 0.9}, "fill",
-                      base_pos.x, top_y,
-                      base_pos.x + self.cols * HALF_TILE_WIDTH, top_y + self.cols * HALF_TILE_HEIGHT,
-                      base_pos.x + self.cols * HALF_TILE_WIDTH, bottom_y + self.cols * HALF_TILE_HEIGHT,
-                      base_pos.x, bottom_y)
-  Window.draw_polygon(self.z_index, {0.8, 0.8, 0.8}, "fill",
-                      base_pos.x + self.cols * HALF_TILE_WIDTH, top_y + self.cols * HALF_TILE_HEIGHT,
-                      base_pos.x + (self.cols + self.rows) * HALF_TILE_WIDTH, top_y + (self.cols - self.rows) * HALF_TILE_HEIGHT,
-                      base_pos.x + (self.cols + self.rows) * HALF_TILE_WIDTH, bottom_y + (self.cols - self.rows) * HALF_TILE_HEIGHT,
-                      base_pos.x + self.cols * HALF_TILE_WIDTH, bottom_y + self.cols * HALF_TILE_HEIGHT)
+  for i = 0, self.cols + self.rows - 1 do
+    local j = i + 1
+    local x1 = base_pos.x + i * HALF_TILE_WIDTH
+    local x2 = x1 + HALF_TILE_WIDTH
+    local y1 = top_y - (i > self.rows and self.rows or i) * HALF_TILE_HEIGHT + (i > self.rows and (i - self.rows) or 0) * HALF_TILE_HEIGHT
+    local y2 = top_y - (j > self.rows and self.rows or j) * HALF_TILE_HEIGHT + (j > self.rows and (j - self.rows) or 0) * HALF_TILE_HEIGHT
+    local y3 = top_y + (i > self.cols and self.cols or i) * HALF_TILE_HEIGHT - (i > self.cols and (i - self.cols) or 0) * HALF_TILE_HEIGHT
+    local y4 = top_y + (j > self.cols and self.cols or j) * HALF_TILE_HEIGHT - (j > self.cols and (j - self.cols) or 0) * HALF_TILE_HEIGHT
+    local y5 = bottom_y + (i > self.cols and self.cols or i) * HALF_TILE_HEIGHT - (i > self.cols and (i - self.cols) or 0) * HALF_TILE_HEIGHT
+    local y6 = bottom_y + (j > self.cols and self.cols or j) * HALF_TILE_HEIGHT - (j > self.cols and (j - self.cols) or 0) * HALF_TILE_HEIGHT
+    local z_ref = i > self.cols and i or j
+    local z = (self.col + self.row + self.rows + (z_ref > self.cols and self.cols or z_ref) - (z_ref > self.cols and (z_ref - self.cols) or 0)) * HALF_TILE_HEIGHT * 100
+    Window.draw_polygon(z, {1, 1, 1}, "fill", x1, y1, x2, y2, x2, y4, x1, y3)
+    Window.draw_polygon(z, {0.9, 0.9, 0.9}, "fill", x1, y3, x2, y4, x2, y6, x1, y5)
+  end
 end
