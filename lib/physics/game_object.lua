@@ -70,7 +70,7 @@ function GameObject:draw_shape(color, z_index)
 end
 
 function GameObject:bounds()
-  return Rectangle.new(self.x, self.y, self.w, self.h)
+  return Rectangle.new(self:get_x(), self:get_y(), self.w, self.h)
 end
 
 function GameObject:get_speed()
@@ -84,7 +84,7 @@ end
 
 function GameObject:get_x()
   if Physics.engine == "love" then
-    return self.body:getX()
+    return self.body:getX() - self.w / 2
   else
     return self.x
   end
@@ -92,7 +92,7 @@ end
 
 function GameObject:get_y()
   if Physics.engine == "love" then
-    return self.body:getY()
+    return self.body:getY() - self.h / 2
   else
     return self.y
   end

@@ -28,6 +28,8 @@ function Scene.new()
     IsoBlock.new(0, 1, 0, 1, 1, 1),
     IsoBlock.new(3, 3, 0, 1, 1, 4),
     IsoBlock.new(10, 3, 2, 1, 1, 1),
+    IsoBlock.new(3, 10, 0, 3, 2, 1),
+    IsoBlock.new(15, 5, 1, 2, 5, 4)
   }
   self.ramps = {
     new_ramp(1, 1, false, true),

@@ -41,8 +41,8 @@ function PlayerCharacter:update()
 end
 
 function PlayerCharacter:draw(map)
-  local x = self:get_x()
-  local y = self:get_y()
+  local x = self:get_x() + self.w / 2
+  local y = self:get_y() + self.h / 2
   local col = math.floor(x / PHYSICS_UNIT)
   local row = math.floor(y / PHYSICS_UNIT)
   local offset_x = x - col * PHYSICS_UNIT
