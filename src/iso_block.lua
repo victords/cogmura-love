@@ -1,7 +1,7 @@
 IsoBlock = {}
 IsoBlock.__index = IsoBlock
 
-function IsoBlock.new(col, row, layer, cols, rows, height)
+function IsoBlock.new(col, row, layer, cols, rows, height, color)
   local self = setmetatable({}, IsoBlock)
   self.col = col
   self.row = row
@@ -14,6 +14,10 @@ function IsoBlock.new(col, row, layer, cols, rows, height)
   self.shape = love.physics.newRectangleShape(cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
   love.physics.newFixture(self.body, self.shape)
   self.body:setUserData(self)
+
+  self.color = color or {1, 1, 1}
+  self.shade_color1 = {0.9 * self.color[1], 0.9 * self.color[2], 0.9 * self.color[3]}
+  self.shade_color2 = {0.8 * self.color[1], 0.8 * self.color[2], 0.8 * self.color[3]}
 
   return self
 end
@@ -36,9 +40,9 @@ function IsoBlock:draw(map)
     local y4 = top_y + (j > self.cols and self.cols or j) * HALF_TILE_HEIGHT - (j > self.cols and (j - self.cols) or 0) * HALF_TILE_HEIGHT
     local y5 = bottom_y + (i > self.cols and self.cols or i) * HALF_TILE_HEIGHT - (i > self.cols and (i - self.cols) or 0) * HALF_TILE_HEIGHT
     local y6 = bottom_y + (j > self.cols and self.cols or j) * HALF_TILE_HEIGHT - (j > self.cols and (j - self.cols) or 0) * HALF_TILE_HEIGHT
-    local z_ref = i > self.cols and i or j
+    local z_ref = j > self.cols and i or j
     local z = (self.col + self.row + self.rows + (z_ref > self.cols and self.cols or z_ref) - (z_ref > self.cols and (z_ref - self.cols) or 0)) * HALF_TILE_HEIGHT * 100
-    Window.draw_polygon(z, {1, 1, 1}, "fill", x1, y1, x2, y2, x2, y4, x1, y3)
-    Window.draw_polygon(z, {0.9, 0.9, 0.9}, "fill", x1, y3, x2, y4, x2, y6, x1, y5)
+    Window.draw_polygon(z, self.color, "fill", x1, y1, x2, y2, x2, y4, x1, y3)
+    Window.draw_polygon(z, j > self.cols and self.shade_color2 or self.shade_color1, "fill", x1, y3, x2, y4, x2, y6, x1, y5)
   end
 end
