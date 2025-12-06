@@ -106,21 +106,28 @@ Utils = {
     end
     return t
   end,
-  join = function(table, separator)
+  join = function(tb, separator)
     separator = separator or ""
     local result = ""
-    for i, value in ipairs(table) do
+    for i, value in ipairs(tb) do
       if i > 1 then result = result .. separator end
       result = result .. value
     end
     return result
   end,
-  map = function(table, mapper)
+  map = function(tb, mapper)
     local mapped = {}
-    for k, v in pairs(table) do
+    for k, v in pairs(tb) do
       mapped[k] = mapper(v)
     end
     return mapped
+  end,
+  select = function(tb, filter)
+    local filtered = {}
+    for _, v in ipairs(tb) do
+      if filter(v) then table.insert(filtered, v) end
+    end
+    return filtered
   end,
   check_anchor = function(anchor, x, y, w, h, area_w, area_h)
     area_w = area_w or Window.reference_width

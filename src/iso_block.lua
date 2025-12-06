@@ -9,6 +9,7 @@ function IsoBlock.new(col, row, layer, cols, rows, height, color)
   self.cols = cols
   self.rows = rows
   self.height = height
+  self.z = layer * PHYSICS_UNIT
 
   self.body = love.physics.newBody(Physics.world, (col + cols / 2) * PHYSICS_UNIT, (row + rows / 2) * PHYSICS_UNIT)
   self.shape = love.physics.newRectangleShape(cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)

@@ -18,6 +18,8 @@ function Scene.new()
     IsoBlock.new(6, 2, 0, 1, 1, 4, {1, 0, 0}),
     IsoBlock.new(1, 3, 0, 7, 1, 1, {0, 1, 0}),
     IsoBlock.new(4, 6, 0, 1, 1, 4, {0, 0, 1}),
+    IsoBlock.new(10, 10, 2, 1, 1, 1),
+    IsoBlock.new(10, 5, 0, 1, 1, 0.5)
   }
   self.player_character = PlayerCharacter.new(5, 5, 0)
 
@@ -26,14 +28,15 @@ function Scene.new()
   return self
 end
 
-function Scene:prepare_obstacles(layer)
+function Scene:prepare_obstacles(player_z, player_height)
   for _, block in ipairs(self.blocks) do
-    block.body:setActive(block.layer == layer)
+    local height = block.height * PHYSICS_UNIT
+    block.body:setActive(block.z + height > player_z and player_z + player_height > block.z)
   end
 end
 
 function Scene:update()
-  self.player_character:update()
+  self.player_character:update(self.blocks)
 end
 
 function Scene:draw()
