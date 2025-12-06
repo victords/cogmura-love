@@ -41,6 +41,7 @@ function PlayerCharacter:update(blocks)
   elseif lf then speed.x = -DIAGONAL_SPEED; speed.y = DIAGONAL_SPEED
   end
 
+  self.z_index = nil
   EventManager.trigger("player_move_start", self.z, self.height)
   self:move(speed, nil, nil, true)
   self:move_z(blocks)
@@ -56,7 +57,11 @@ function PlayerCharacter:draw(map)
   local base_pos = map:get_screen_pos(col, row)
   local screen_x = base_pos.x + HALF_TILE_WIDTH * (1 + (offset_x / PHYSICS_UNIT) - (offset_y / PHYSICS_UNIT))
   local screen_y = base_pos.y + HALF_TILE_HEIGHT * ((offset_x / PHYSICS_UNIT) + (offset_y / PHYSICS_UNIT))
-  self.img:draw(Utils.round(screen_x - self.img.width / 2), Utils.round(screen_y - ISO_UNIT - 8) - (self.z / PHYSICS_UNIT) * ISO_UNIT, (col + row + 2) * HALF_TILE_HEIGHT * 100)
+  self.img:draw(
+    Utils.round(screen_x - self.img.width / 2),
+    Utils.round(screen_y - ISO_UNIT - 8) - (self.z / PHYSICS_UNIT) * ISO_UNIT,
+    self.z_index or (col + row + 2) * HALF_TILE_HEIGHT * 100
+  )
 end
 
 -- private
@@ -119,7 +124,12 @@ function PlayerCharacter:move_z(blocks)
   for _, block in ipairs(intersecting_blocks) do
     if block.top > self.z and block.top <= self.z + STEP_THRESHOLD then
       self.z = block.top
+      floor = block
       break
     end
+  end
+
+  if floor and floor.max_z_index then
+    self.z_index = floor.max_z_index
   end
 end

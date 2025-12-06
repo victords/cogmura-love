@@ -10,7 +10,9 @@ function MainMenu.new()
       EventManager.trigger("game_start")
     end),
     Button.new(0, -15, {w = 150, h = 30, font = font, text = "Options", anchor = "center"}),
-    Button.new(0, 35, {w = 150, h = 30, font = font, text = "Exit", anchor = "center"}),
+    Button.new(0, 35, {w = 150, h = 30, font = font, text = "Exit", anchor = "center"}, function()
+      love.event.quit()
+    end),
   }
 
   return self
