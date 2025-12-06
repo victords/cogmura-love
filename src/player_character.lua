@@ -63,21 +63,29 @@ end
 
 function PlayerCharacter:move_z(blocks)
   local bounds = self:inner_bounds()
-  local layer = math.floor(self.z / PHYSICS_UNIT)
-  local floors = Utils.select(blocks, function(block)
-    return block.layer + block.height == layer and block:bounds():intersect(bounds)
+  local intersecting_blocks = Utils.select(blocks, function(block)
+    return block:bounds():intersect(bounds)
   end)
-  local ceilings = Utils.select(blocks, function(block)
-    return block.z >= self.z + self.height and block:bounds():intersect(bounds)
+  local floors = Utils.select(intersecting_blocks, function(block)
+    return block.top <= self.z
+  end)
+  local ceilings = Utils.select(intersecting_blocks, function(block)
+    return block.z >= self.z + self.height
   end)
 
   local floor = nil
   local ceiling = nil
   local max = -1
+  local max_z_index = -1
   local min = 1000000
   for _, f in ipairs(floors) do
-    if f.col + f.row + f.cols + f.rows > max then
-      max = f.col + f.row + f.cols + f.rows
+    local z_index = f.col + f.row + f.cols + f.rows
+    if f.top > max then
+      max = f.top
+      max_z_index = z_index
+      floor = f
+    elseif f.top == max and z_index > max_z_index then
+      max_z_index = z_index
       floor = f
     end
   end
@@ -88,22 +96,30 @@ function PlayerCharacter:move_z(blocks)
     end
   end
 
-  floor = floor or layer == 0
-  local floor_z = layer * PHYSICS_UNIT
-  local grounded = floor and self.z == floor_z
+  local grounded = self.z == 0 or (floor and self.z == floor.top)
   if grounded then
     if KB.pressed("space") then self.speed_z = JUMP_SPEED end
   else
     self.speed_z = self.speed_z - GRAVITY
   end
 
-  if floor and self.speed_z < 0 and self.z + self.speed_z < floor_z then
-    self.z = floor_z
+  if floor == nil and self.speed_z < 0 and self.z + self.speed_z < 0 then
+    self.z = 0
+    self.speed_z = 0
+  elseif floor and self.speed_z < 0 and self.z + self.speed_z < floor.top then
+    self.z = floor.top
     self.speed_z = 0
   elseif ceiling and self.speed_z > 0 and self.z + self.height + self.speed_z > ceiling.z then
     self.z = ceiling.z - self.height
     self.speed_z = 0
   else
     self.z = self.z + self.speed_z
+  end
+
+  for _, block in ipairs(intersecting_blocks) do
+    if block.top > self.z and block.top <= self.z + STEP_THRESHOLD then
+      self.z = block.top
+      break
+    end
   end
 end
