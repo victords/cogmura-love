@@ -1,7 +1,7 @@
 IsoBlock = {}
 IsoBlock.__index = IsoBlock
 
-function IsoBlock.new(col, row, layer, cols, rows, height, color)
+function IsoBlock.new(col, row, layer, cols, rows, height, diagonal, color)
   local self = setmetatable({}, IsoBlock)
   self.col = col
   self.row = row
@@ -11,12 +11,39 @@ function IsoBlock.new(col, row, layer, cols, rows, height, color)
   self.height = height
   self.z = layer * PHYSICS_UNIT
   self.top = (layer + height) * PHYSICS_UNIT
-  self.max_z_index = (col + row + cols + rows) * HALF_TILE_HEIGHT * 100 + layer + height
+  self.diagonal = diagonal
 
-  self.body = love.physics.newBody(Physics.world, (col + cols / 2) * PHYSICS_UNIT, (row + rows / 2) * PHYSICS_UNIT)
-  self.shape = love.physics.newRectangleShape(cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
-  love.physics.newFixture(self.body, self.shape)
-  self.body:setUserData(self)
+  if diagonal then
+    self.ramps = {}
+    for i = 0, cols - 1 do
+      table.insert(self.ramps, Ramp.new((col + i - 0.5) * PHYSICS_UNIT, (row - i - 0.5) * PHYSICS_UNIT, PHYSICS_UNIT, PHYSICS_UNIT, true, false))
+      table.insert(self.ramps, Ramp.new((col + rows + i - 0.5) * PHYSICS_UNIT, (row + rows - i - 0.5) * PHYSICS_UNIT, PHYSICS_UNIT, PHYSICS_UNIT, false, true))
+    end
+    for i = 0, rows - 1 do
+      table.insert(self.ramps, Ramp.new((col + i - 0.5) * PHYSICS_UNIT, (row + i + 0.5) * PHYSICS_UNIT, PHYSICS_UNIT, PHYSICS_UNIT, true, true))
+      table.insert(self.ramps, Ramp.new((col + cols + i - 0.5) * PHYSICS_UNIT, (row - cols + i + 0.5) * PHYSICS_UNIT, PHYSICS_UNIT, PHYSICS_UNIT, false, false))
+    end
+
+    self.inner_rects = {}
+    for i = 0, cols + rows - 2 do
+      local top_row = i < cols and (row - i) or (row - 2 * cols + i + 2)
+      local bottom_row = i < rows and (row + i + 1) or (row + 2 * rows - i - 1)
+      table.insert(
+        self.inner_rects,
+        Rectangle.new((col + i) * PHYSICS_UNIT, top_row * PHYSICS_UNIT, PHYSICS_UNIT, (bottom_row - top_row) * PHYSICS_UNIT)
+      )
+    end
+
+    self.max_z_index = ((col + row) * HALF_TILE_HEIGHT + rows * TILE_HEIGHT) * 100 + layer + height
+  else
+    self.body = love.physics.newBody(Physics.world, (col + cols / 2) * PHYSICS_UNIT, (row + rows / 2) * PHYSICS_UNIT)
+    local shape = love.physics.newRectangleShape(cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
+    love.physics.newFixture(self.body, shape)
+    self.body:setUserData(self)
+    self.bounds = Rectangle.new(col * PHYSICS_UNIT, row * PHYSICS_UNIT, cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
+
+    self.max_z_index = (col + row + cols + rows) * HALF_TILE_HEIGHT * 100 + layer + height
+  end
 
   self.color = color or {1, 1, 1}
   self.shade_color1 = {0.9 * self.color[1], 0.9 * self.color[2], 0.9 * self.color[3]}
@@ -25,11 +52,41 @@ function IsoBlock.new(col, row, layer, cols, rows, height, color)
   return self
 end
 
-function IsoBlock:bounds()
-  return Rectangle.new(self.col * PHYSICS_UNIT, self.row * PHYSICS_UNIT, self.cols * PHYSICS_UNIT, self.rows * PHYSICS_UNIT)
+function IsoBlock:setBodyActive(active)
+  if self.diagonal then
+    for _, r in ipairs(self.ramps) do
+      r.body:setActive(active)
+    end
+  else
+    self.body:setActive(active)
+  end
+end
+
+function IsoBlock:intersect(rect)
+  if self.diagonal then
+    for _, r in ipairs(self.ramps) do
+      if r:intersect(rect) then return true end
+    end
+    for _, r in ipairs(self.inner_rects) do
+      if r:intersect(rect) then return true end
+    end
+    return false
+  else
+    return self.bounds:intersect(rect)
+  end
 end
 
 function IsoBlock:draw(map)
+  if self.diagonal then
+    local base_pos = map:get_screen_pos(self.col + self.rows - 1, self.row + self.rows - 1)
+    local bottom_y = base_pos.y + TILE_HEIGHT - self.layer * ISO_UNIT
+    local top_y = bottom_y - self.height * ISO_UNIT
+    Window.draw_rectangle(base_pos.x, top_y, self.max_z_index, self.cols * TILE_WIDTH, self.height * ISO_UNIT, self.shade_color2)
+    Window.draw_rectangle(base_pos.x, top_y - self.rows * TILE_HEIGHT, self.max_z_index, self.cols * TILE_WIDTH, self.rows * TILE_HEIGHT, self.color)
+
+    return
+  end
+
   local base_pos = map:get_screen_pos(self.col, self.row + self.rows - 1)
   local bottom_y = base_pos.y + HALF_TILE_HEIGHT - self.layer * ISO_UNIT
   local top_y = bottom_y - self.height * ISO_UNIT

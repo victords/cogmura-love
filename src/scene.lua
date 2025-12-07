@@ -15,14 +15,17 @@ function Scene.new()
 
   self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, 20, 20, Window.reference_width, Window.reference_height, true, false)
   self.blocks = {
-    IsoBlock.new(6, 2, 0, 1, 1, 4, {1, 0, 0}),
-    IsoBlock.new(1, 3, 0, 7, 1, 1, {0, 1, 0}),
-    IsoBlock.new(4, 6, 0, 1, 1, 4, {0, 0, 1}),
+    IsoBlock.new(6, 2, 0, 1, 1, 4, false, {1, 0, 0}),
+    IsoBlock.new(1, 3, 0, 7, 1, 1, false, {0, 1, 0}),
+    IsoBlock.new(4, 6, 0, 1, 1, 4, false, {0, 0, 1}),
     IsoBlock.new(10, 10, 2, 1, 1, 1),
     IsoBlock.new(10, 5, 0, 1, 1, 0.25),
     IsoBlock.new(10, 4, 0, 1, 1, 0.5),
     IsoBlock.new(10, 3, 0, 1, 1, 0.75),
     IsoBlock.new(10, 2, 0, 1, 1, 1),
+    IsoBlock.new(2, 13, 0, 3, 4, 2, true),
+    IsoBlock.new(12, 7, 0, 5, 2, 1, true),
+    IsoBlock.new(11, 11, 0, 1, 1, 1, true),
   }
   self.player_character = PlayerCharacter.new(5, 5, 0)
 
@@ -34,7 +37,7 @@ end
 function Scene:prepare_obstacles(player_z, player_height)
   for _, block in ipairs(self.blocks) do
     local height = block.height * PHYSICS_UNIT
-    block.body:setActive(block.top > player_z + STEP_THRESHOLD and player_z + player_height > block.z)
+    block:setBodyActive(block.top > player_z + STEP_THRESHOLD and player_z + player_height > block.z)
   end
 end
 

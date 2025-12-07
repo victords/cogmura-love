@@ -69,7 +69,7 @@ end
 function PlayerCharacter:move_z(blocks)
   local bounds = self:inner_bounds()
   local intersecting_blocks = Utils.select(blocks, function(block)
-    return block:bounds():intersect(bounds)
+    return block:intersect(bounds)
   end)
   local floors = Utils.select(intersecting_blocks, function(block)
     return block.top <= self.z
