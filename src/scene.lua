@@ -27,6 +27,12 @@ function Scene.new()
     IsoBlock.new(12, 7, 0, 5, 2, 1, true),
     IsoBlock.new(11, 11, 0, 1, 1, 1, true),
   }
+  self.objects = {
+    IsoGameObject.new(5, 8, 0, 12, 12, PHYSICS_UNIT, "sprite/obj")
+  }
+  for _, obj in ipairs(self.objects) do
+    obj.body:setActive(false)
+  end
   self.player_character = PlayerCharacter.new(5, 5, 0)
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
@@ -53,6 +59,9 @@ function Scene:draw()
 
   for _, block in ipairs(self.blocks) do
     block:draw(self.map)
+  end
+  for _, object in ipairs(self.objects) do
+    object:draw(self.map)
   end
   self.player_character:draw(self.map)
 end

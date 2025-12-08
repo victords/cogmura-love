@@ -1,4 +1,6 @@
-PlayerCharacter = setmetatable({}, GameObject)
+require("src/iso_game_object")
+
+PlayerCharacter = setmetatable({}, IsoGameObject)
 PlayerCharacter.__index = PlayerCharacter
 
 BASE_SPEED = 3 * PHYSICS_UNIT -- move 3 tiles per second
@@ -6,10 +8,8 @@ DIAGONAL_SPEED = BASE_SPEED * math.sqrt(2) * 0.5
 JUMP_SPEED = 10 -- per frame
 
 function PlayerCharacter.new(col, row, layer)
-  local self = GameObject.new((col + 0.5) * PHYSICS_UNIT - 6, (row + 0.5) * PHYSICS_UNIT - 6, 12, 12, "sprite/player", nil, nil, nil, {shape = "circle"})
+  local self = IsoGameObject.new(col, row, layer, 12, 12, PHYSICS_UNIT, "sprite/player", nil, nil, nil, {shape = "circle"})
   setmetatable(self, PlayerCharacter)
-  self.z = layer * PHYSICS_UNIT
-  self.height = PHYSICS_UNIT
   self.speed_z = 0
   self.inner_size = self.w * math.sqrt(2) * 0.5
   self.inner_offset = (self.w - self.inner_size) * 0.5
@@ -45,23 +45,6 @@ function PlayerCharacter:update(blocks)
   EventManager.trigger("player_move_start", self.z, self.height)
   self:move(speed, nil, nil, true)
   self:move_z(blocks)
-end
-
-function PlayerCharacter:draw(map)
-  local x = self:get_x() + self.w / 2
-  local y = self:get_y() + self.h / 2
-  local col = math.floor(x / PHYSICS_UNIT)
-  local row = math.floor(y / PHYSICS_UNIT)
-  local offset_x = x - col * PHYSICS_UNIT
-  local offset_y = y - row * PHYSICS_UNIT
-  local base_pos = map:get_screen_pos(col, row)
-  local screen_x = base_pos.x + HALF_TILE_WIDTH * (1 + (offset_x / PHYSICS_UNIT) - (offset_y / PHYSICS_UNIT))
-  local screen_y = base_pos.y + HALF_TILE_HEIGHT * ((offset_x / PHYSICS_UNIT) + (offset_y / PHYSICS_UNIT))
-  self.img:draw(
-    Utils.round(screen_x - self.img.width / 2),
-    Utils.round(screen_y - ISO_UNIT - 8) - (self.z / PHYSICS_UNIT) * ISO_UNIT,
-    self.z_index or (col + row + 2) * HALF_TILE_HEIGHT * 100
-  )
 end
 
 -- private

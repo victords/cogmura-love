@@ -34,7 +34,7 @@ function IsoBlock.new(col, row, layer, cols, rows, height, diagonal, color)
       )
     end
 
-    self.max_z_index = ((col + row) * HALF_TILE_HEIGHT + rows * TILE_HEIGHT) * 100 + layer + height
+    self.max_z_index = ((col + row) * HALF_TILE_HEIGHT + rows * TILE_HEIGHT) * 10000 + (layer + height) * 100
   else
     self.body = love.physics.newBody(Physics.world, (col + cols / 2) * PHYSICS_UNIT, (row + rows / 2) * PHYSICS_UNIT)
     local shape = love.physics.newRectangleShape(cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
@@ -42,7 +42,7 @@ function IsoBlock.new(col, row, layer, cols, rows, height, diagonal, color)
     self.body:setUserData(self)
     self.bounds = Rectangle.new(col * PHYSICS_UNIT, row * PHYSICS_UNIT, cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
 
-    self.max_z_index = (col + row + cols + rows) * HALF_TILE_HEIGHT * 100 + layer + height
+    self.max_z_index = (col + row + cols + rows) * HALF_TILE_HEIGHT * 10000 + (layer + height) * 100
   end
 
   self.color = color or {1, 1, 1}
@@ -101,8 +101,8 @@ function IsoBlock:draw(map)
     local y5 = bottom_y + (i > self.cols and self.cols or i) * HALF_TILE_HEIGHT - (i > self.cols and (i - self.cols) or 0) * HALF_TILE_HEIGHT
     local y6 = bottom_y + (j > self.cols and self.cols or j) * HALF_TILE_HEIGHT - (j > self.cols and (j - self.cols) or 0) * HALF_TILE_HEIGHT
     local z_ref = j > self.cols and i or j
-    local z = (self.col + self.row + self.rows + (z_ref > self.cols and self.cols or z_ref) - (z_ref > self.cols and (z_ref - self.cols) or 0)) * HALF_TILE_HEIGHT * 100
-    z = z + self.layer + self.height
+    local z = (self.col + self.row + self.rows + (z_ref > self.cols and self.cols or z_ref) - (z_ref > self.cols and (z_ref - self.cols) or 0)) * HALF_TILE_HEIGHT * 10000
+    z = z + (self.layer + self.height) * 100
     Window.draw_polygon(z, self.color, "fill", x1, y1, x2, y2, x2, y4, x1, y3)
     Window.draw_polygon(z, j > self.cols and self.shade_color2 or self.shade_color1, "fill", x1, y3, x2, y4, x2, y6, x1, y5)
   end
