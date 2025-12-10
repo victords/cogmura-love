@@ -18,14 +18,13 @@ function Scene.new()
     IsoBlock.new(6, 2, 0, 1, 1, 4, false, {1, 0, 0}),
     IsoBlock.new(1, 3, 0, 7, 1, 1, false, {0, 1, 0}),
     IsoBlock.new(4, 6, 0, 1, 1, 4, false, {0, 0, 1}),
-    IsoBlock.new(10, 10, 2, 1, 1, 1),
+    IsoBlock.new(9, 9, 0, 2, 2, 2, false, "sprite/block2"),
     IsoBlock.new(10, 5, 0, 1, 1, 0.25),
     IsoBlock.new(10, 4, 0, 1, 1, 0.5),
     IsoBlock.new(10, 3, 0, 1, 1, 0.75),
     IsoBlock.new(10, 2, 0, 1, 1, 1),
-    IsoBlock.new(2, 13, 0, 3, 4, 2, true),
+    IsoBlock.new(2, 13, 0, 3, 4, 2, true, "sprite/block1", Vector.new(-10, -10)),
     IsoBlock.new(12, 7, 0, 5, 2, 1, true),
-    IsoBlock.new(11, 11, 0, 1, 1, 1, true),
   }
   self.objects = {
     IsoGameObject.new(5, 8, 0, 12, 12, PHYSICS_UNIT, "sprite/obj")
@@ -42,7 +41,6 @@ end
 
 function Scene:prepare_obstacles(player_z, player_height)
   for _, block in ipairs(self.blocks) do
-    local height = block.height * PHYSICS_UNIT
     block:setBodyActive(block.top > player_z + STEP_THRESHOLD and player_z + player_height > block.z)
   end
 end

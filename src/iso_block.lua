@@ -1,16 +1,17 @@
 IsoBlock = {}
 IsoBlock.__index = IsoBlock
 
-function IsoBlock.new(col, row, layer, cols, rows, height, diagonal, color)
+function IsoBlock.new(col, row, layer, cols, rows, layers, diagonal, color_or_image, img_gap)
   local self = setmetatable({}, IsoBlock)
   self.col = col
   self.row = row
   self.layer = layer
   self.cols = cols
   self.rows = rows
-  self.height = height
+  self.layers = layers
   self.z = layer * PHYSICS_UNIT
-  self.top = (layer + height) * PHYSICS_UNIT
+  self.height = layers * PHYSICS_UNIT
+  self.top = self.z + self.height
   self.diagonal = diagonal
 
   if diagonal then
@@ -34,7 +35,7 @@ function IsoBlock.new(col, row, layer, cols, rows, height, diagonal, color)
       )
     end
 
-    self.max_z_index = ((col + row) * HALF_TILE_HEIGHT + rows * TILE_HEIGHT) * 10000 + (layer + height) * 100
+    self.max_z_index = ((col + row) * HALF_TILE_HEIGHT + rows * TILE_HEIGHT) * 10000 + (layer + layers) * 100
   else
     self.body = love.physics.newBody(Physics.world, (col + cols / 2) * PHYSICS_UNIT, (row + rows / 2) * PHYSICS_UNIT)
     local shape = love.physics.newRectangleShape(cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
@@ -42,12 +43,21 @@ function IsoBlock.new(col, row, layer, cols, rows, height, diagonal, color)
     self.body:setUserData(self)
     self.bounds = Rectangle.new(col * PHYSICS_UNIT, row * PHYSICS_UNIT, cols * PHYSICS_UNIT, rows * PHYSICS_UNIT)
 
-    self.max_z_index = (col + row + cols + rows) * HALF_TILE_HEIGHT * 10000 + (layer + height) * 100
+    self.max_z_index = (col + row + cols + rows) * HALF_TILE_HEIGHT * 10000 + (layer + layers) * 100
   end
 
-  self.color = color or {1, 1, 1}
-  self.shade_color1 = {0.9 * self.color[1], 0.9 * self.color[2], 0.9 * self.color[3]}
-  self.shade_color2 = {0.8 * self.color[1], 0.8 * self.color[2], 0.8 * self.color[3]}
+  if type(color_or_image) == "string" then
+    self.img_gap = img_gap or Vector.new
+    if diagonal then
+      self.image = Res.img(color_or_image)
+    else
+      self.image = Res.tileset(color_or_image, cols + rows, 1)
+    end
+  else
+    self.color = color_or_image or {1, 1, 1}
+    self.shade_color1 = {0.9 * self.color[1], 0.9 * self.color[2], 0.9 * self.color[3]}
+    self.shade_color2 = {0.8 * self.color[1], 0.8 * self.color[2], 0.8 * self.color[3]}
+  end
 
   return self
 end
@@ -77,11 +87,33 @@ function IsoBlock:intersect(rect)
 end
 
 function IsoBlock:draw(map)
+  if self.image then
+    local base_pos = map:get_screen_pos(self.col, self.row)
+    local y = base_pos.y - (self.layer + self.layers) * ISO_UNIT
+
+    if self.diagonal then
+      self.image:draw(base_pos.x + self.img_gap.x, y + self.img_gap.y, self.max_z_index)
+
+      return
+    end
+
+    local base_x = base_pos.x - (self.rows - 1) * HALF_TILE_WIDTH
+    for i = 0, self.cols + self.rows - 1 do
+      local j = i + 1
+      local z_ref = j > self.cols and i or j
+      local z = (self.col + self.row + self.rows + (z_ref > self.cols and self.cols or z_ref) - (z_ref > self.cols and (z_ref - self.cols) or 0)) * HALF_TILE_HEIGHT * 10000
+      z = z + (self.layer + self.layers) * 100
+      self.image[i + 1]:draw(base_x + i * HALF_TILE_WIDTH, y, z)
+    end
+
+    return
+  end
+
   if self.diagonal then
     local base_pos = map:get_screen_pos(self.col + self.rows - 1, self.row + self.rows - 1)
     local bottom_y = base_pos.y + TILE_HEIGHT - self.layer * ISO_UNIT
-    local top_y = bottom_y - self.height * ISO_UNIT
-    Window.draw_rectangle(base_pos.x, top_y, self.max_z_index, self.cols * TILE_WIDTH, self.height * ISO_UNIT, self.shade_color2)
+    local top_y = bottom_y - self.layers * ISO_UNIT
+    Window.draw_rectangle(base_pos.x, top_y, self.max_z_index, self.cols * TILE_WIDTH, self.layers * ISO_UNIT, self.shade_color2)
     Window.draw_rectangle(base_pos.x, top_y - self.rows * TILE_HEIGHT, self.max_z_index, self.cols * TILE_WIDTH, self.rows * TILE_HEIGHT, self.color)
 
     return
@@ -89,7 +121,7 @@ function IsoBlock:draw(map)
 
   local base_pos = map:get_screen_pos(self.col, self.row + self.rows - 1)
   local bottom_y = base_pos.y + HALF_TILE_HEIGHT - self.layer * ISO_UNIT
-  local top_y = bottom_y - self.height * ISO_UNIT
+  local top_y = bottom_y - self.layers * ISO_UNIT
   for i = 0, self.cols + self.rows - 1 do
     local j = i + 1
     local x1 = base_pos.x + i * HALF_TILE_WIDTH
@@ -102,7 +134,7 @@ function IsoBlock:draw(map)
     local y6 = bottom_y + (j > self.cols and self.cols or j) * HALF_TILE_HEIGHT - (j > self.cols and (j - self.cols) or 0) * HALF_TILE_HEIGHT
     local z_ref = j > self.cols and i or j
     local z = (self.col + self.row + self.rows + (z_ref > self.cols and self.cols or z_ref) - (z_ref > self.cols and (z_ref - self.cols) or 0)) * HALF_TILE_HEIGHT * 10000
-    z = z + (self.layer + self.height) * 100
+    z = z + (self.layer + self.layers) * 100
     Window.draw_polygon(z, self.color, "fill", x1, y1, x2, y2, x2, y4, x1, y3)
     Window.draw_polygon(z, j > self.cols and self.shade_color2 or self.shade_color1, "fill", x1, y3, x2, y4, x2, y6, x1, y5)
   end
