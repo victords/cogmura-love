@@ -26,12 +26,12 @@ function IsoBlock.new(col, row, layer, cols, rows, layers, diagonal, color_or_im
     end
 
     self.inner_rects = {}
-    for i = 0, cols + rows - 2 do
-      local top_row = i < cols and (row - i) or (row - 2 * cols + i + 2)
-      local bottom_row = i < rows and (row + i + 1) or (row + 2 * rows - i - 1)
+    for i = 1, cols + rows - 2 do
+      local top_row = i < cols and (row - i) or (row - 2 * cols + i + 1)
+      local bottom_row = i < rows and (row + i) or (row + 2 * rows - i - 1)
       table.insert(
         self.inner_rects,
-        Rectangle.new((col + i) * PHYSICS_UNIT, top_row * PHYSICS_UNIT, PHYSICS_UNIT, (bottom_row - top_row) * PHYSICS_UNIT)
+        Rectangle.new((col + i - 0.5) * PHYSICS_UNIT, (top_row + 0.5) * PHYSICS_UNIT, PHYSICS_UNIT, (bottom_row - top_row) * PHYSICS_UNIT)
       )
     end
 
