@@ -25,8 +25,16 @@ function Scene.new()
     IsoBlock.new(2, 13, 0, 3, 4, 2, true, "sprite/block1", Vector.new(-10, -10)),
     IsoBlock.new(12, 7, 0, 5, 2, 1, true),
   }
+
+  local image = PrimitiveImage.new(
+    40, 40,
+    {type = "circle", x = 20, y = 20, radius = 20, color = {1, 0, 0}},
+    {type = "rectangle", x = 4, y = 4, w = 8, h = 8, color = {0, 0, 0}},
+    {type = "rectangle", x = 28, y = 4, w = 8, h = 8, color = {0, 0, 1}}
+  )
   self.objects = {
-    IsoGameObject.new(5, 8, 0, 12, 12, PHYSICS_UNIT, "sprite/obj")
+    IsoGameObject.new(5, 8, 0, 12, 12, PHYSICS_UNIT, "sprite/obj"),
+    IsoGameObject.new(15, 13, 0, 12, 12, PHYSICS_UNIT, image, Vector.new(0, 14))
   }
   for _, obj in ipairs(self.objects) do
     obj.body:setActive(false)

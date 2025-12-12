@@ -5,6 +5,8 @@ function PrimitiveImage.new(width, height, ...)
   local self = setmetatable({}, PrimitiveImage)
   self.shapes = {...}
   self.canvas = love.graphics.newCanvas(width, height)
+  self.width = width
+  self.height = height
   self.needs_redraw = true
 
   Window.on_toggle(PrimitiveImage.on_window_toggle, self)

@@ -1,11 +1,17 @@
 IsoGameObject = setmetatable({}, GameObject)
 IsoGameObject.__index = IsoGameObject
 
-function IsoGameObject.new(col, row, layer, width, depth, height, img_path, img_gap, cols, rows, physics_options)
-  local self = GameObject.new((col + 0.5) * PHYSICS_UNIT - width * 0.5, (row + 0.5) * PHYSICS_UNIT - depth * 0.5, width, depth, img_path, img_gap, cols, rows, physics_options)
+function IsoGameObject.new(col, row, layer, width, depth, height, img_or_path, img_gap, cols, rows, physics_options)
+  local img = nil
+  if getmetatable(img_or_path) == PrimitiveImage then
+    img = img_or_path
+    img_or_path = nil
+  end
+  local self = GameObject.new((col + 0.5) * PHYSICS_UNIT - width * 0.5, (row + 0.5) * PHYSICS_UNIT - depth * 0.5, width, depth, img_or_path, img_gap, cols, rows, physics_options)
   setmetatable(self, IsoGameObject)
   self.z = layer * PHYSICS_UNIT
   self.height = height
+  self.img = self.img or img
   return self
 end
 
