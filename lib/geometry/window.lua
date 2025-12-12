@@ -1,5 +1,6 @@
-Window = {}
-Window.__index = Window
+Window = {
+  toggle_handlers = {}
+}
 
 local function add_to_layer(z, args)
   z = z or 1
@@ -9,7 +10,7 @@ local function add_to_layer(z, args)
   table.insert(Window.layers[z], args)
 end
 
-function Window.init(fullscreen, width, height, reference_width, reference_height)
+function Window.init(fullscreen, width, height, reference_width, reference_height, is_update)
   width = width or 1280
   height = height or 720
   reference_width = reference_width or 1280
@@ -53,12 +54,25 @@ function Window.init(fullscreen, width, height, reference_width, reference_heigh
     end
   end
 
-  love.window.setMode(screen_width, screen_height, { fullscreen = fullscreen })
+  local method = is_update and "updateMode" or "setMode"
+  love.window[method](screen_width, screen_height, { fullscreen = fullscreen })
 end
 
 function Window.toggle_fullscreen()
   local currently_fullscreen = love.window.getFullscreen()
-  Window.init(not currently_fullscreen, Window.width, Window.height, Window.reference_width, Window.reference_height)
+  Window.init(not currently_fullscreen, Window.width, Window.height, Window.reference_width, Window.reference_height, true)
+
+  for _, handler in ipairs(Window.toggle_handlers) do
+    if handler[2] then
+      handler[1](handler[2])
+    else
+      handler[1]()
+    end
+  end
+end
+
+function Window.on_toggle(handler, obj)
+  table.insert(Window.toggle_handlers, {handler, obj})
 end
 
 function Window.set_shader(path)
@@ -93,6 +107,10 @@ end
 
 function Window.draw_text(text, font, x, y, z, color, scale_x, scale_y, angle, origin_x, origin_y)
   add_to_layer(z, {"print", color, text, font, x, y, angle, scale_x, scale_y, origin_x, origin_y})
+end
+
+function Window.draw_canvas(canvas, x, y, z, color)
+  add_to_layer(z, {"draw", color, canvas, x, y})
 end
 
 function Window.draw(draw_code)

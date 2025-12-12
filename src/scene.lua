@@ -6,8 +6,7 @@ Scene = {}
 Scene.__index = Scene
 
 local function draw_tile(color, x, y)
-  if color then love.graphics.setColor(color) end
-  love.graphics.polygon("fill", x + HALF_TILE_WIDTH, y, x + TILE_WIDTH, y + HALF_TILE_HEIGHT, x + HALF_TILE_WIDTH, y + TILE_HEIGHT, x, y + HALF_TILE_HEIGHT)
+  Window.draw_polygon(1, color, "fill", x + HALF_TILE_WIDTH, y, x + TILE_WIDTH, y + HALF_TILE_HEIGHT, x + HALF_TILE_WIDTH, y + TILE_HEIGHT, x, y + HALF_TILE_HEIGHT)
 end
 
 function Scene.new()

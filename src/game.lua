@@ -5,6 +5,7 @@ require("src.in_game_ui")
 require("src.main_menu")
 require("src.player_stats")
 require("src.scene")
+require("src.primitive_image")
 
 Game = {
   load = function()
@@ -18,6 +19,12 @@ Game = {
     }
 
     EventManager.listen("game_start", Game.on_start)
+    image = PrimitiveImage.new(
+      40, 40,
+      {type = "circle", x = 20, y = 20, radius = 20, color = {1, 0, 0}},
+      {type = "rectangle", x = 4, y = 4, w = 8, h = 8, color = {0, 0, 0}},
+      {type = "rectangle", x = 28, y = 4, w = 8, h = 8, color = {0, 0, 1}}
+    )
   end,
   update = function(dt)
     KB.update()
@@ -39,6 +46,7 @@ Game = {
       for _, controller in ipairs(Game.controllers) do
         controller:draw()
       end
+      image:draw(0, 100)
     end)
   end,
   toggle_gamepad = function(enabled)
