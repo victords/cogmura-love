@@ -1,6 +1,7 @@
 require("src.constants")
 require("src.iso_block")
 require("src.player_character")
+require("src.enemy")
 
 Scene = {}
 Scene.__index = Scene
@@ -34,7 +35,9 @@ function Scene.new()
   )
   self.objects = {
     IsoGameObject.new(5, 8, 0, 12, 12, PHYSICS_UNIT, "sprite/obj"),
-    IsoGameObject.new(15, 13, 0, 12, 12, PHYSICS_UNIT, image, Vector.new(0, 14))
+    IsoGameObject.new(15, 13, 0, 12, 12, PHYSICS_UNIT, image, Vector.new(0, 14)),
+    Enemy.new("1", 13, 15, 0),
+    Enemy.new("1", 13, 16, 0),
   }
   for _, obj in ipairs(self.objects) do
     obj.body:setActive(false)
