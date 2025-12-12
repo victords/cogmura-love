@@ -23,8 +23,8 @@ function IsoGameObject:draw(map)
   local screen_y = base_pos.y + HALF_TILE_HEIGHT * (offset_x_ratio + offset_y_ratio)
   local layer = math.floor(self.z / PHYSICS_UNIT)
   self.img:draw(
-    Utils.round(screen_x - self.img.width / 2),
-    Utils.round(screen_y - ISO_UNIT - 8) - (self.z / PHYSICS_UNIT) * ISO_UNIT,
+    Utils.round(screen_x - self.img.width / 2 + self.img_gap.x),
+    Utils.round(screen_y - (self.z + self.height) / PHYSICS_UNIT * ISO_UNIT + self.img_gap.y),
     self.z_index or Utils.round((col + row + 2) * HALF_TILE_HEIGHT * 10000 + layer * 100 + (offset_x_ratio + offset_y_ratio) * 50)
   )
 end
