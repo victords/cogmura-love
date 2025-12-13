@@ -1,6 +1,8 @@
 PrimitiveImage = {}
 PrimitiveImage.__index = PrimitiveImage
 
+DEGREES_TO_RADIANS = math.pi / 180
+
 function PrimitiveImage.new(width, height, ...)
   local self = setmetatable({}, PrimitiveImage)
   self.shapes = {...}
@@ -27,6 +29,8 @@ function PrimitiveImage:draw(x, y, z)
         love.graphics.rectangle("fill", shape.x, shape.y, shape.w, shape.h)
       elseif shape.type == "circle" then
         love.graphics.circle("fill", shape.x, shape.y, shape.radius)
+      elseif shape.type == "arc" then
+        love.graphics.arc("fill", shape.x, shape.y, shape.radius, shape.a1 * DEGREES_TO_RADIANS, shape.a2 * DEGREES_TO_RADIANS)
       end
     end
     love.graphics.setCanvas(Window.canvas)
