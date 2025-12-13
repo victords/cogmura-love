@@ -62,7 +62,7 @@ function IsoBlock.new(col, row, layer, cols, rows, layers, diagonal, color_or_im
   return self
 end
 
-function IsoBlock:setBodyActive(active)
+function IsoBlock:set_body_active(active)
   if self.diagonal then
     for _, r in ipairs(self.ramps) do
       r.body:setActive(active)

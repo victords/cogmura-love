@@ -98,6 +98,14 @@ function GameObject:get_y()
   end
 end
 
+function GameObject:get_mass_center()
+  if Physics.engine == "love" then
+    return Vector.new(self.body:getX(), self.body:getY())
+  else
+    return Vector.new(self.x + self.w / 2, self.y + self.h / 2)
+  end
+end
+
 function GameObject:move(forces, obst, ramps, set_speed)
   if Physics.engine == "love" then
     if obst then
@@ -413,6 +421,10 @@ function GameObject:clear_contacts(obj)
   if self.right == obj then self.right = nil end
   if self.top == obj then self.top = nil end
   if self.bottom == obj then self.bottom = nil end
+end
+
+function GameObject:is_in_contact_with(obj)
+  return self.left == obj or self.right == obj or self.top == obj or self.bottom == obj
 end
 
 -- private

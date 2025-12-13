@@ -31,9 +31,6 @@ function Scene.new()
     Enemy.new("1", 13, 15, 0),
     Enemy.new("1", 13, 16, 0),
   }
-  for _, obj in ipairs(self.objects) do
-    obj.body:setActive(false)
-  end
   self.player_character = PlayerCharacter.new(5, 5, 0)
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
@@ -43,12 +40,15 @@ end
 
 function Scene:prepare_obstacles(player_z, player_height)
   for _, block in ipairs(self.blocks) do
-    block:setBodyActive(block.top > player_z + STEP_THRESHOLD and player_z + player_height > block.z)
+    block:set_body_active(block.top > player_z + STEP_THRESHOLD and player_z + player_height > block.z)
   end
 end
 
 function Scene:update()
   self.player_character:update(self.blocks)
+  for _, obj in ipairs(self.objects) do
+    obj:update(self.player_character)
+  end
 end
 
 function Scene:draw()
