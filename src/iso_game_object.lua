@@ -1,3 +1,5 @@
+require("src.primitive_image")
+
 IsoGameObject = setmetatable({}, GameObject)
 IsoGameObject.__index = IsoGameObject
 

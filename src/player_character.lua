@@ -13,7 +13,15 @@ function PlayerCharacter.new(col, row, layer)
   self.speed_z = 0
   self.inner_size = self.w * math.sqrt(2) * 0.5
   self.inner_offset = (self.w - self.inner_size) * 0.5
+
+  EventManager.listen("battle_start", PlayerCharacter.on_battle_start, self)
+
   return self
+end
+
+function PlayerCharacter:on_battle_start()
+  self.body:setActive(false)
+  self.speed_z = 0
 end
 
 function PlayerCharacter:inner_bounds()

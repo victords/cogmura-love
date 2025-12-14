@@ -12,6 +12,7 @@ end
 
 function Scene.new()
   local self = setmetatable({}, Scene)
+  self.index = 1
 
   self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, 20, 20, Window.reference_width, Window.reference_height, true, false)
   self.blocks = {
@@ -26,7 +27,6 @@ function Scene.new()
     IsoBlock.new(2, 13, 0, 3, 4, 2, true, "sprite/block1", Vector.new(-10, -10)),
     IsoBlock.new(12, 7, 0, 5, 2, 1, true),
   }
-
   self.objects = {
     Enemy.new("1", 13, 15, 0),
     Enemy.new("1", 13, 16, 0),
@@ -34,6 +34,7 @@ function Scene.new()
   self.player_character = PlayerCharacter.new(5, 5, 0)
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
+  EventManager.listen("battle_start", Scene.on_battle_start, self)
 
   return self
 end
@@ -44,7 +45,13 @@ function Scene:prepare_obstacles(player_z, player_height)
   end
 end
 
+function Scene:on_battle_start()
+  self.in_battle = true
+end
+
 function Scene:update()
+  if self.in_battle then return end
+
   self.player_character:update(self.blocks)
   for _, obj in ipairs(self.objects) do
     obj:update(self.player_character)

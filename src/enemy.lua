@@ -74,13 +74,17 @@ function Enemy.new(id, col, row, layer)
   local self = IsoGameObject.new(col, row, layer, size, size, ENEMY_HEIGHT, img_or_path, img_gap, nil, nil)
   setmetatable(self, Enemy)
   self.stats = Stats.new(cache.max_hp, cache.max_mp, cache.str, cache.def, cache.exp, cache.money)
+  self.active = true
 
   return self
 end
 
 function Enemy:update(player_character)
   if self:is_in_contact_with(player_character) then
-    print("---- fight!")
+    self.active = false
+    self.body:setActive(false)
+    EventManager.trigger("battle_start", self)
+    return
   end
 
   local d = self:get_mass_center():distance(player_character:get_mass_center())

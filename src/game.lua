@@ -5,7 +5,7 @@ require("src.in_game_ui")
 require("src.main_menu")
 require("src.player_stats")
 require("src.scene")
-require("src.primitive_image")
+require("src.battle")
 
 Game = {
   load = function()
@@ -19,6 +19,7 @@ Game = {
     }
 
     EventManager.listen("game_start", Game.on_start)
+    EventManager.listen("battle_start", Game.on_battle_start)
   end,
   update = function(dt)
     KB.update()
@@ -46,9 +47,13 @@ Game = {
     print("gamepad " .. (enabled and "enabled" or "disabled"))
   end,
   on_start = function()
+    Game.scene = Scene.new()
     Game.controllers = {
-      Scene.new(),
+      Game.scene,
       InGameUi.new(Game.player_stats)
     }
+  end,
+  on_battle_start = function(initiator)
+    table.insert(Game.controllers, Battle.new(Game.scene.index, initiator))
   end
 }
