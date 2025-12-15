@@ -76,13 +76,18 @@ function Enemy.new(id, col, row, layer)
   self.stats = Stats.new(cache.max_hp, cache.max_mp, cache.str, cache.def, cache.exp, cache.money)
   self.active = true
 
+  EventManager.listen("battle_start", Enemy.deactivate, self)
+
   return self
+end
+
+function Enemy:deactivate()
+  self.active = false
+  self.body:setActive(false)
 end
 
 function Enemy:update(player_character)
   if self:is_in_contact_with(player_character) then
-    self.active = false
-    self.body:setActive(false)
     EventManager.trigger("battle_start", self)
     return
   end
