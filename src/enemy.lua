@@ -13,6 +13,7 @@ function Enemy.new(id, col, row, layer)
 
   local self = IsoGameObject.new(col, row, layer, data.size, data.size, ENEMY_HEIGHT, data.img_or_path, data.img_gap)
   setmetatable(self, Enemy)
+  self.id = id
   self.active = true
 
   EventManager.listen("battle_start", Enemy.deactivate, self)

@@ -55,7 +55,7 @@ Game = {
     }
   end,
   on_battle_start = function(initiator)
-    table.insert(Game.controllers, Battle.new(Game.scene.index, initiator))
+    table.insert(Game.controllers, Battle.new(Game.scene.map, Game.scene.battle_spawn_points, initiator))
     table.insert(Game.controllers, BattleUi.new(Game.player_stats))
   end
 }

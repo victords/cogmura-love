@@ -32,6 +32,7 @@ function Scene.new()
     Enemy.new("1", 13, 16, 0),
   }
   self.player_character = PlayerCharacter.new(5, 5, 0)
+  self.battle_spawn_points = {{3, 16}, {12, 12}, {16, 12}, {16, 16}}
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
@@ -67,8 +68,11 @@ function Scene:draw()
   for _, block in ipairs(self.blocks) do
     block:draw(self.map)
   end
-  for _, object in ipairs(self.objects) do
-    object:draw(self.map)
+
+  if not self.in_battle then
+    for _, object in ipairs(self.objects) do
+      object:draw(self.map)
+    end
+    self.player_character:draw(self.map)
   end
-  self.player_character:draw(self.map)
 end
