@@ -33,6 +33,6 @@ function IsoGameObject:draw(map)
   self.img:draw(
     Utils.round(screen_x - self.img.width / 2 + self.img_gap.x),
     Utils.round(screen_y - (self.z + self.height) / PHYSICS_UNIT * ISO_UNIT + self.img_gap.y),
-    self.z_index or Utils.round((col + row + 2) * HALF_TILE_HEIGHT * 10000 + layer * 100 + (offset_x_ratio + offset_y_ratio) * 50)
+    self.z_index or Utils.round((col + row + 2) * 10000 + layer * 100 + (offset_x_ratio + offset_y_ratio) * 50)
   )
 end

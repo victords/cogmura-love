@@ -6,6 +6,7 @@ require("src.main_menu")
 require("src.player_stats")
 require("src.scene")
 require("src.battle")
+require("src.battle_ui")
 
 Game = {
   load = function()
@@ -55,5 +56,6 @@ Game = {
   end,
   on_battle_start = function(initiator)
     table.insert(Game.controllers, Battle.new(Game.scene.index, initiator))
+    table.insert(Game.controllers, BattleUi.new(Game.player_stats))
   end
 }
