@@ -12,7 +12,7 @@ function Battle.new(map, spawn_points, initiator)
     if index == 1 then
       self.player = BattlePlayer.new(spawn_point[1], spawn_point[2], spawn_point[3] or 0)
     else
-      table.insert(self.enemies, BattleEnemy.new(initiator.id, spawn_point[1], spawn_point[2], spawn_point[3] or 0))
+      table.insert(self.enemies, BattleEnemy.new(initiator.id, spawn_point[1], spawn_point[2], spawn_point[3] or 0, map))
     end
   end
 
