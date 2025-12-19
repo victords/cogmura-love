@@ -36,6 +36,7 @@ function Scene.new()
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
+  EventManager.listen("battle_finish", Scene.on_battle_finish, self)
 
   return self
 end
@@ -48,6 +49,18 @@ end
 
 function Scene:on_battle_start()
   self.in_battle = true
+  self.player_character:deactivate()
+  for _, object in ipairs(self.objects) do
+    object:deactivate()
+  end
+end
+
+function Scene:on_battle_finish()
+  self.in_battle = false
+  self.player_character:activate()
+  for _, object in ipairs(self.objects) do
+    object:activate()
+  end
 end
 
 function Scene:update()

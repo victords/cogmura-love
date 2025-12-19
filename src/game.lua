@@ -8,6 +8,17 @@ require("src.scene")
 require("src.battle")
 require("src.battle_ui")
 
+local function remove_controllers(...)
+  local classes = {...}
+  for i = #Game.controllers, 1, -1 do
+    for _, class in ipairs(classes) do
+      if getmetatable(Game.controllers[i]) == class then
+        table.remove(Game.controllers, i)
+      end
+    end
+  end
+end
+
 Game = {
   load = function()
     Window.init(false, 1280, 720, 1920, 1080)
@@ -21,6 +32,9 @@ Game = {
 
     EventManager.listen("game_start", Game.on_start)
     EventManager.listen("battle_start", Game.on_battle_start)
+    EventManager.listen("battle_finish", Game.on_battle_finish)
+
+    math.randomseed(os.time())
   end,
   update = function(dt)
     KB.update()
@@ -58,5 +72,8 @@ Game = {
     local battle = Battle.new(Game.scene.map, Game.scene.battle_spawn_points, initiator)
     table.insert(Game.controllers, battle)
     table.insert(Game.controllers, BattleUi.new(Game.player_stats, battle))
+  end,
+  on_battle_finish = function()
+    remove_controllers(Battle, BattleUi)
   end
 }

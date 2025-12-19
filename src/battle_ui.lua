@@ -11,11 +11,11 @@ function BattleUi.new(player_stats, battle)
 
   self.buttons = {
     base = {
-      { text = "attack", x = 0, y = 0, action = function() self:start_target_selection() end },
+      { text = "attack", x = 0, y = 0, action = function() self:start_target_selection("attack") end },
       { text = "flee", x = 0, y = 40, action = function() self:start_action("flee") end }
     },
     targets = Utils.map(battle.enemies, function(enemy)
-      return { x = enemy.screen_x, y = enemy.screen_y - 40, action = function() self:confirm_target() end }
+      return { x = enemy.screen_x - 20, y = enemy.screen_y - 100, action = function() self:confirm_target() end }
     end)
   }
   self.button_list = self.buttons.base
@@ -26,18 +26,19 @@ function BattleUi.new(player_stats, battle)
   return self
 end
 
-function BattleUi:start_target_selection()
+function BattleUi:start_target_selection(action)
+  self.action = action
   self.button_list = self.buttons.targets
   self.button_index = 1
 end
 
 function BattleUi:start_action(action, ...)
-  --self.battle:on_action_start(action, ...)
+  self.battle:on_action_start(action, ...)
   self.active = false
 end
 
 function BattleUi:confirm_target()
-  -- TODO
+  self:start_action(self.action, self.button_index)
 end
 
 function BattleUi:update()
@@ -68,11 +69,11 @@ function BattleUi:draw()
   local is_base = self.button_list == self.buttons.base
   for i, b in ipairs(self.buttons.base) do
     Window.draw_rectangle(b.x, b.y, UI_Z_INDEX, 150, 35, is_base and i == self.button_index and {0.5, 0.5, 0.5} or {0.75, 0.75, 0.75})
-    self.font:draw_text(b.text, b.x, b.y, UI_Z_INDEX)
+    self.font:draw_text(b.text, b.x, b.y, UI_Z_INDEX, {0, 0, 0})
   end
   if not is_base then
     for i, b in ipairs(self.button_list) do
-      Window.draw_rectangle(b.x, b.y, UI_Z_INDEX, 35, 35, i == self.button_index and {0.5, 0.5, 0.5} or  {0.75, 0.75, 0.75})
+      Window.draw_rectangle(b.x, b.y, UI_Z_INDEX, 40, 40, i == self.button_index and {0.5, 0.5, 0.5} or  {0.75, 0.75, 0.75})
     end
   end
 end

@@ -16,9 +16,12 @@ function Enemy.new(id, col, row, layer)
   self.id = id
   self.active = true
 
-  EventManager.listen("battle_start", Enemy.deactivate, self)
-
   return self
+end
+
+function Enemy:activate()
+  self.active_timer = 120
+  self.body:setActive(true)
 end
 
 function Enemy:deactivate()
@@ -27,6 +30,15 @@ function Enemy:deactivate()
 end
 
 function Enemy:update(player_character)
+  if self.active_timer then
+    self.active_timer = self.active_timer - 1
+    if self.active_timer == 0 then
+      self.active_timer = nil
+      self.active = true
+    end
+  end
+  if not self.active then return end
+
   if self:is_in_contact_with(player_character) then
     EventManager.trigger("battle_start", self)
     return
