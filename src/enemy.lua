@@ -26,6 +26,7 @@ end
 
 function Enemy:deactivate()
   self.active = false
+  self.body:setLinearVelocity(0, 0)
   self.body:setActive(false)
 end
 

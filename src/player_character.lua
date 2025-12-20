@@ -22,6 +22,7 @@ function PlayerCharacter:activate()
 end
 
 function PlayerCharacter:deactivate()
+  self.body:setLinearVelocity(0, 0)
   self.body:setActive(false)
   self.speed_z = 0
 end
