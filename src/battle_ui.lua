@@ -23,6 +23,16 @@ function BattleUi.new(player_stats, battle)
   self.font = Res.font("font", 24)
   self.active = true
 
+  self.health_bars = {
+    ProgressBar.new(battle.player.screen_x - 40, battle.player.screen_y - 100, {w = 80, h = 10, bg_color = {1, 0, 0}, fg_color = {0, 1, 0}, max_value = player_stats.max_hp, value = player_stats.hp})
+  }
+  for _, enemy in ipairs(battle.enemies) do
+    table.insert(
+      self.health_bars,
+      ProgressBar.new(enemy.screen_x - 40, enemy.screen_y - 100, {w = 80, h = 10, bg_color = {1, 0, 0}, fg_color = {0, 1, 0}, max_value = enemy.stats.max_hp, value = enemy.stats.hp})
+    )
+  end
+
   return self
 end
 
@@ -62,7 +72,9 @@ function BattleUi:update()
 end
 
 function BattleUi:draw()
-  -- draw player and enemy stats
+  for _, b in ipairs(self.health_bars) do
+    b:draw(nil, UI_Z_INDEX)
+  end
 
   if not self.active then return end
 

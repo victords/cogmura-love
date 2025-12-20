@@ -158,6 +158,7 @@ require("lib.forms.button")
 require("lib.forms.drop_down_list")
 require("lib.forms.label")
 require("lib.forms.panel")
+require("lib.forms.progress_bar")
 require("lib.forms.text_field")
 require("lib.forms.toggle_button")
 
