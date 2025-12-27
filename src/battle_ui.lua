@@ -11,11 +11,11 @@ function BattleUi.new(player_stats, battle)
 
   self.buttons = {
     base = {
-      { text = "attack", x = 0, y = 0, action = function() self:start_target_selection("attack") end },
-      { text = "flee", x = 0, y = 40, action = function() self:start_action("flee") end }
+      { text = "attack", x = 0, y = 0, w = 150, h = 35, action = function() self:start_target_selection("attack") end },
+      { text = "flee", x = 0, y = 40, w = 150, h = 35, action = function() self:start_action("flee") end }
     },
     targets = Utils.map(battle.enemies, function(enemy)
-      return { x = enemy.screen_x - 20, y = enemy.screen_y - 100, action = function() self:confirm_target() end }
+      return { x = enemy.screen_x - 20, y = enemy.screen_y - 80, w = 40, h = 40, action = function() self:confirm_target() end }
     end)
   }
   self.button_list = self.buttons.base
@@ -24,12 +24,12 @@ function BattleUi.new(player_stats, battle)
   self.active = true
 
   self.health_bars = {
-    ProgressBar.new(battle.player.screen_x - 40, battle.player.screen_y - 100, {w = 80, h = 10, bg_color = {1, 0, 0}, fg_color = {0, 1, 0}, max_value = player_stats.max_hp, value = player_stats.hp})
+    ProgressBar.new(battle.player.screen_x - 40, battle.player.screen_y + 20, {w = 80, h = 10, bg_color = {1, 0, 0}, fg_color = {0, 1, 0}, max_value = player_stats.max_hp, value = player_stats.hp})
   }
   for _, enemy in ipairs(battle.enemies) do
     table.insert(
       self.health_bars,
-      ProgressBar.new(enemy.screen_x - 40, enemy.screen_y - 100, {w = 80, h = 10, bg_color = {1, 0, 0}, fg_color = {0, 1, 0}, max_value = enemy.stats.max_hp, value = enemy.stats.hp})
+      ProgressBar.new(enemy.screen_x - 40, enemy.screen_y + 20, {w = 80, h = 10, bg_color = {1, 0, 0}, fg_color = {0, 1, 0}, max_value = enemy.stats.max_hp, value = enemy.stats.hp})
     )
   end
 
@@ -78,14 +78,10 @@ function BattleUi:draw()
 
   if not self.active then return end
 
-  local is_base = self.button_list == self.buttons.base
-  for i, b in ipairs(self.buttons.base) do
-    Window.draw_rectangle(b.x, b.y, UI_Z_INDEX, 150, 35, is_base and i == self.button_index and {0.5, 0.5, 0.5} or {0.75, 0.75, 0.75})
-    self.font:draw_text(b.text, b.x, b.y, UI_Z_INDEX, {0, 0, 0})
-  end
-  if not is_base then
-    for i, b in ipairs(self.button_list) do
-      Window.draw_rectangle(b.x, b.y, UI_Z_INDEX, 40, 40, i == self.button_index and {0.5, 0.5, 0.5} or  {0.75, 0.75, 0.75})
+  for i, b in ipairs(self.button_list) do
+    Window.draw_rectangle(b.x, b.y, UI_Z_INDEX, b.w, b.h, i == self.button_index and {0.5, 0.5, 0.5} or {0.75, 0.75, 0.75})
+    if b.text then
+      self.font:draw_text(b.text, b.x, b.y, UI_Z_INDEX, {0, 0, 0})
     end
   end
 end
