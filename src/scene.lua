@@ -53,6 +53,9 @@ function Scene:on_battle_start()
   for _, object in ipairs(self.objects) do
     object:deactivate()
   end
+  for _, block in ipairs(self.blocks) do
+    block:set_body_active(false)
+  end
 end
 
 function Scene:on_battle_finish()
@@ -61,14 +64,17 @@ function Scene:on_battle_finish()
   for _, object in ipairs(self.objects) do
     object:activate()
   end
+  for _, block in ipairs(self.blocks) do
+    block:set_body_active(true)
+  end
 end
 
 function Scene:update()
   if self.in_battle then return end
 
   self.player_character:update(self.blocks)
-  for _, obj in ipairs(self.objects) do
-    obj:update(self.player_character)
+  for _, object in ipairs(self.objects) do
+    object:update(self.player_character)
   end
 end
 
