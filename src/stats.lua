@@ -13,3 +13,22 @@ function Stats.new(max_hp, max_mp, str, def, exp, money, hp, mp)
   self.money = money
   return self
 end
+
+function Stats:take_damage(amount)
+  amount = amount - self.def
+  self:set_hp(self.hp - amount)
+end
+
+function Stats:set_hp(value)
+  local prev_value = self.hp
+  if value < 0 then
+    self.hp = 0
+  elseif value > self.max_hp then
+    self.hp = self.max_hp
+  else
+    self.hp = value
+  end
+  if self.on_hp_change then
+    self.on_hp_change(prev_value, self.hp)
+  end
+end

@@ -38,7 +38,8 @@ function Battle:on_action_start(action, ...)
 end
 
 function Battle:player_attack()
-  print("---- attack", self.target)
+  self.target.stats:take_damage(self.player.stats.str)
+  self.player:move_to_start(Battle.start_enemy_turn, self)
 end
 
 function Battle:start_enemy_turn()
