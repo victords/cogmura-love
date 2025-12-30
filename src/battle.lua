@@ -1,16 +1,17 @@
+require("src.battle.health_bar")
 require("src.battle.player")
 require("src.battle.enemy")
 
 Battle = {}
 Battle.__index = Battle
 
-function Battle.new(map, spawn_points, initiator)
+function Battle.new(player_stats, map, spawn_points, initiator)
   local self = setmetatable({}, Battle)
   self.map = map
   self.enemies = {}
   for index, spawn_point in ipairs(spawn_points) do
     if index == 1 then
-      self.player = BattlePlayer.new(spawn_point[1], spawn_point[2], spawn_point[3] or 0, map)
+      self.player = BattlePlayer.new(player_stats, spawn_point[1], spawn_point[2], spawn_point[3] or 0, map)
     else
       table.insert(self.enemies, BattleEnemy.new(initiator.id, spawn_point[1], spawn_point[2], spawn_point[3] or 0, map))
     end

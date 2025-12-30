@@ -69,9 +69,9 @@ Game = {
     }
   end,
   on_battle_start = function(initiator)
-    local battle = Battle.new(Game.scene.map, Game.scene.battle_spawn_points, initiator)
+    local battle = Battle.new(Game.player_stats, Game.scene.map, Game.scene.battle_spawn_points, initiator)
     table.insert(Game.controllers, battle)
-    table.insert(Game.controllers, BattleUi.new(Game.player_stats, battle))
+    table.insert(Game.controllers, BattleUi.new(battle))
   end,
   on_battle_finish = function()
     remove_controllers(Battle, BattleUi)
