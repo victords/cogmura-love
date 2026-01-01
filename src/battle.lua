@@ -1,4 +1,3 @@
-require("src.battle.health_bar")
 require("src.battle.player")
 require("src.battle.enemy")
 
