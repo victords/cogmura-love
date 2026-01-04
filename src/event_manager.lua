@@ -4,7 +4,7 @@ EventManager = {
     if EventManager.handlers[event_name] == nil then
       EventManager.handlers[event_name] = {}
     end
-    table.insert(EventManager.handlers[event_name], { handler, obj })
+    table.insert(EventManager.handlers[event_name], {handler, obj})
   end,
   trigger = function(event_name, ...)
     if EventManager.handlers[event_name] == nil then return end

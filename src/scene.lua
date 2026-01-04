@@ -32,7 +32,7 @@ function Scene.new()
     Enemy.new("1", 13, 16, 0),
   }
   self.player_character = PlayerCharacter.new(5, 5, 0)
-  self.battle_spawn_points = {{3, 16}, {12, 12}, {16, 12}, {16, 16}}
+  self.battle_spawn_points = {{3, 16}, {12, 12}, {16, 12}}
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)

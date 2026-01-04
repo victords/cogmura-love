@@ -16,8 +16,18 @@ function Battle.new(player_stats, map, spawn_points, initiator)
     table.insert(self.combatants, combatant)
     if index == 1 then
       self.player = combatant
+      combatant.stats.on_hp_change:listen(function (old_value, new_value)
+        if new_value == 0 then
+          EventManager.trigger("battle_finish", "defeat")
+        end
+      end)
     else
       table.insert(self.enemies, combatant)
+      combatant.stats.on_hp_change:listen(function(old_value, new_value)
+        if new_value == 0 then
+          self:on_enemy_defeat(combatant)
+        end
+      end)
     end
     combatant.on_action_select = function(action) return self:get_available_targets(action) end
     combatant.on_action_perform = function(action) self:resolve_action(action) end
@@ -27,6 +37,15 @@ function Battle.new(player_stats, map, spawn_points, initiator)
   self.combatant_index = 0
 
   return self
+end
+
+function Battle:on_enemy_defeat(enemy)
+  Utils.remove(self.combatants, enemy)
+  Utils.remove(self.enemies, enemy)
+
+  if #self.enemies == 0 then
+    EventManager.trigger("battle_finish", "victory")
+  end
 end
 
 function Battle:get_available_targets(action)

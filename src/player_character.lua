@@ -3,7 +3,7 @@ require("src/iso_game_object")
 PlayerCharacter = setmetatable({}, IsoGameObject)
 PlayerCharacter.__index = PlayerCharacter
 
-BASE_SPEED = 3 * PHYSICS_UNIT -- move 3 tiles per second
+BASE_SPEED = 5 * PHYSICS_UNIT -- move 3 tiles per second
 DIAGONAL_SPEED = BASE_SPEED * math.sqrt(2) * 0.5
 JUMP_SPEED = 10 -- per frame
 

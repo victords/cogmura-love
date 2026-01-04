@@ -1,3 +1,5 @@
+require("src.event")
+
 Stats = {}
 Stats.__index = Stats
 
@@ -11,6 +13,9 @@ function Stats.new(max_hp, max_mp, str, def, exp, money, hp, mp)
   self.def = def
   self.exp = exp
   self.money = money
+
+  self.on_hp_change = Event.new()
+
   return self
 end
 
@@ -28,7 +33,5 @@ function Stats:set_hp(value)
   else
     self.hp = value
   end
-  if self.on_hp_change then
-    self.on_hp_change(prev_value, self.hp)
-  end
+  self.on_hp_change:trigger(prev_value, self.hp)
 end

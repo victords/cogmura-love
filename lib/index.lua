@@ -129,6 +129,14 @@ Utils = {
     end
     return filtered
   end,
+  remove = function(tb, element)
+    for i = #tb, 1, -1 do
+      if tb[i] == element then
+        table.remove(tb, i)
+        break
+      end
+    end
+  end,
   check_anchor = function(anchor, x, y, w, h, area_w, area_h)
     area_w = area_w or Window.reference_width
     area_h = area_h or Window.reference_height
