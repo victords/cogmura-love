@@ -11,7 +11,19 @@ function BattleEnemy.new(id, col, row, layer, map)
   return self
 end
 
-function BattleEnemy:draw(map)
-  IsoGameObject.draw(self, map)
-  self.health_bar:draw()
+function BattleEnemy:update()
+  if not self.active then return end
+
+  if self.state == "idle" then
+    local action = {type = "attack", value = self.stats.str}
+    local targets = self.on_action_select(action)
+    action.target = targets[1]
+    local target_pos = targets[1]:get_mass_center() + Vector.new(PHYSICS_UNIT, -PHYSICS_UNIT)
+    self:set_moving_towards(target_pos, function()
+      self.on_action_perform(action)
+      self:set_moving_to_start()
+    end)
+  elseif self.state == "moving" then
+    self:move_towards_target()
+  end
 end

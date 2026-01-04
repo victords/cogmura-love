@@ -6,7 +6,6 @@ require("src.main_menu")
 require("src.player_stats")
 require("src.scene")
 require("src.battle")
-require("src.battle_ui")
 
 local function remove_controllers(...)
   local classes = {...}
@@ -71,9 +70,8 @@ Game = {
   on_battle_start = function(initiator)
     local battle = Battle.new(Game.player_stats, Game.scene.map, Game.scene.battle_spawn_points, initiator)
     table.insert(Game.controllers, battle)
-    table.insert(Game.controllers, BattleUi.new(battle))
   end,
   on_battle_finish = function()
-    remove_controllers(Battle, BattleUi)
+    remove_controllers(Battle)
   end
 }
