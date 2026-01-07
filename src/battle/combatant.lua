@@ -43,6 +43,7 @@ end
 
 function Combatant:set_moving_to_start()
   self:set_moving_towards(self.start_pos, function()
+    self:end_turn()
     self.on_action_finish()
   end)
 end

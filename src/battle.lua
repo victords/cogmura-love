@@ -31,12 +31,20 @@ function Battle.new(player_stats, map, spawn_points, initiator)
     end
     combatant.on_action_select = function(action) return self:get_available_targets(action) end
     combatant.on_action_perform = function(action) self:resolve_action(action) end
-    combatant.on_action_finish = function() self:end_turn() end
+    combatant.on_action_finish = function() self:set_next_combatant() end
   end
   self.flee_probability = 0.99
   self.combatant_index = 0
+  self:set_next_combatant()
 
   return self
+end
+
+function Battle:set_next_combatant()
+  self.combatant_index = self.combatant_index + 1
+  if self.combatant_index > #self.combatants then self.combatant_index = 1 end
+  self.active_combatant = self.combatants[self.combatant_index]
+  self.active_combatant:start_turn()
 end
 
 function Battle:on_enemy_defeat(enemy)
@@ -70,19 +78,7 @@ function Battle:resolve_action(action)
   end
 end
 
-function Battle:end_turn()
-  self.active_combatant:end_turn()
-  self.active_combatant = nil
-end
-
 function Battle:update()
-  if self.active_combatant == nil then
-    self.combatant_index = self.combatant_index + 1
-    if self.combatant_index > #self.combatants then self.combatant_index = 1 end
-    self.active_combatant = self.combatants[self.combatant_index]
-    self.active_combatant:start_turn()
-  end
-
   for _, combatant in ipairs(self.combatants) do
     combatant:update()
   end
