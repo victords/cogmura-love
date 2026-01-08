@@ -4,40 +4,12 @@ EnemyCache = {
     "bruk",
   },
   fetch = function(id)
-    id = tonumber(id)
-
     if EnemyCache.cache[id] == nil then
       local data = Utils.split(love.filesystem.read("data/enemy/" .. EnemyCache.name_map[id] .. ".txt"), "\n")
       local attrs = Utils.split(data[1], ",")
-
-      size = tonumber(attrs[7])
-      img_gap = Vector.new(attrs[8] and tonumber(attrs[8]) or 0, attrs[9] and tonumber(attrs[9]) or 0)
-
-      if data[2]:sub(1, 1) == "!" then
-        local shapes_data = Utils.split(data[2], "!")
-        local shapes = {}
-        local img_width = nil
-        local img_height = nil
-        for _, shape_data in ipairs(shapes_data) do
-          local s_a = Utils.map(Utils.split(shape_data:sub(2), ","), function(s) return tonumber(s) end)
-          if shape_data:sub(1, 1) == "r" then
-            color = {s_a[5], s_a[6], s_a[7]}
-            table.insert(shapes, { type = "rectangle", x = s_a[1], y = s_a[2], w = s_a[3], h = s_a[4], color = color })
-          elseif shape_data:sub(1, 1) == "c" then
-            color = {s_a[4], s_a[5], s_a[6]}
-            table.insert(shapes, { type = "circle", x = s_a[1], y = s_a[2], radius = s_a[3], color = color })
-          elseif shape_data:sub(1, 1) == "a" then
-            color = {s_a[6], s_a[7], s_a[8]}
-            table.insert(shapes, { type = "arc", x = s_a[1], y = s_a[2], radius = s_a[3], a1 = s_a[4], a2 = s_a[5], color = color })
-          elseif shape_data:sub(1, 1) == "s" then
-            img_width = s_a[1]
-            img_height = s_a[2]
-          end
-        end
-        img_or_path = PrimitiveImage.new(img_width, img_height, unpack(shapes))
-      else
-        img_or_path = data[2]
-      end
+      local size = tonumber(attrs[7])
+      local img_gap = Vector.new(attrs[8] and tonumber(attrs[8]) or 0, attrs[9] and tonumber(attrs[9]) or 0)
+      local img_or_path = data[2]:sub(1, 1) == "!" and PrimitiveImage.parse(data[2]) or data[2]
 
       EnemyCache.cache[id] = {
         max_hp = tonumber(attrs[1]),

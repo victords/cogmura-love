@@ -2,6 +2,7 @@ require("src.constants")
 require("src.iso_block")
 require("src.player_character")
 require("src.enemy")
+require("src.item")
 
 Scene = {}
 Scene.__index = Scene
@@ -28,8 +29,9 @@ function Scene.new()
     IsoBlock.new(12, 7, 0, 5, 2, 1, true),
   }
   self.objects = {
-    Enemy.new("1", 13, 15, 0),
-    Enemy.new("1", 13, 16, 0),
+    Enemy.new(1, 13, 15, 0),
+    Enemy.new(1, 13, 16, 0),
+    Item.new(1, 7, 5, 0),
   }
   self.player_character = PlayerCharacter.new(5, 5, 0)
   self.battle_spawn_points = {{3, 16}, {12, 12}, {16, 12}}
