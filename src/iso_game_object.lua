@@ -17,6 +17,12 @@ function IsoGameObject.new(col, row, layer, width, depth, height, img_or_path, i
   return self
 end
 
+function IsoGameObject:intersect(other)
+  if not self:bounds():intersect(other:bounds()) then return false end
+
+  return self.z + self.height > other.z and other.z + other.height > self.z
+end
+
 function IsoGameObject:draw(map)
   local x = self:get_x() + self.w / 2
   local y = self:get_y() + self.h / 2

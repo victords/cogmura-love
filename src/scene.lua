@@ -75,8 +75,12 @@ function Scene:update()
   if self.in_battle then return end
 
   self.player_character:update(self.blocks)
-  for _, object in ipairs(self.objects) do
+  for i = #self.objects, 1, -1 do
+    local object = self.objects[i]
     object:update(self.player_character)
+    if object.destroyed then
+      table.remove(self.objects, i)
+    end
   end
 end
 

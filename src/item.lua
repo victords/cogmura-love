@@ -15,4 +15,11 @@ function Item.new(id, col, row, layer)
   return self
 end
 
-function Item:update() end
+function Item:update(player_character)
+  if self.destroyed then return end
+
+  if self:intersect(player_character) then
+    EventManager.trigger("item_pick_up", self.id)
+    self.destroyed = true
+  end
+end
