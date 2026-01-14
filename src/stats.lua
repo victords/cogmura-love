@@ -24,6 +24,10 @@ function Stats:take_damage(amount)
   self:set_hp(self.hp - amount)
 end
 
+function Stats:heal(amount)
+  self:set_hp(self.hp + amount)
+end
+
 function Stats:set_hp(value)
   local prev_value = self.hp
   if value < 0 then

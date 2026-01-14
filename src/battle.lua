@@ -63,6 +63,12 @@ function Battle:get_available_targets(action)
     else
       return {self.player}
     end
+  elseif action.type == "item" then
+    if action.item.target == "ally" then
+      return {self.player}
+    else
+      return self.enemies
+    end
   elseif action.type == "flee" then
     return nil
   end
@@ -71,6 +77,10 @@ end
 function Battle:resolve_action(action)
   if action.type == "attack" then
     action.target.stats:take_damage(action.value)
+  elseif action.type == "item" then
+    if action.item.type == "heal" then
+      action.target.stats:heal(action.item.value)
+    end
   elseif action.type == "flee" then
     if math.random() < self.flee_probability then
       EventManager.trigger("battle_finish", "flee")

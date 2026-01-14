@@ -9,9 +9,23 @@ function BattlePlayer.new(stats, col, row, layer, map)
   self.is_player = true
 
   self.action_buttons = {
-    { text = "attack", x = 0, y = 0, w = 150, h = 35, action = function() self:start_target_selection("attack") end },
-    { text = "flee", x = 0, y = 40, w = 150, h = 35, action = function() self.on_action_perform({type = "flee"}) end }
+    { text = "attack", x = 0, y = 0, w = 150, h = 35, action = function() self:start_target_selection({type = "attack", value = stats.str}) end },
+    { text = "item", x = 0, y = 40, w = 150, h = 35, action = function() self:start_item_selection() end },
+    { text = "flee", x = 0, y = 80, w = 150, h = 35, action = function() self.on_action_perform({type = "flee"}) end }
   }
+  self.item_buttons = {}
+  local index = 0
+  for item_id, amount in pairs(stats.inventory) do
+    local item = ItemCache.fetch(item_id)
+    table.insert(self.item_buttons, {
+      text = ItemCache.name_map[item_id],
+      x = 150, y = index * 40, w = 150, h = 35,
+      action = function()
+        self:start_target_selection({type = "item", item = item})
+      end
+    })
+    index = index + 1
+  end
   self.button_list = self.action_buttons
   self.button_index = 1
   self.font = Res.font("font", 24)
@@ -19,15 +33,16 @@ function BattlePlayer.new(stats, col, row, layer, map)
   return self
 end
 
-function BattlePlayer:start_target_selection(action_type)
-  local targets = self.on_action_select({type = action_type})
+function BattlePlayer:start_target_selection(action)
+  local targets = self.on_action_select(action)
   self.button_index = 1
   self.button_list = Utils.map(targets, function(target)
-    local action = {type = action_type, target = target}
-    if action_type == "attack" then
-      action.value = self.stats.str
+    local action_with_target = Utils.clone(action)
+    action_with_target.target = target
+    local target_pos = target:get_mass_center()
+    if target ~= self then
+      target_pos = target_pos + Vector.new(-PHYSICS_UNIT, PHYSICS_UNIT)
     end
-    local target_pos = target:get_mass_center() + Vector.new(-PHYSICS_UNIT, PHYSICS_UNIT)
     return {
       x = target.screen_x - 20,
       y = target.screen_y - 80,
@@ -35,12 +50,19 @@ function BattlePlayer:start_target_selection(action_type)
       h = 40,
       action = function()
         self:set_moving_towards(target_pos, function()
-          self.on_action_perform(action)
+          self.on_action_perform(action_with_target)
           self:set_moving_to_start()
         end)
       end
     }
   end)
+end
+
+function BattlePlayer:start_item_selection()
+  if #self.item_buttons == 0 then return end
+
+  self.button_list = self.item_buttons
+  self.button_index = 1
 end
 
 function BattlePlayer:end_turn()

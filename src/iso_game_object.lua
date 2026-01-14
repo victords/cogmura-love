@@ -23,6 +23,10 @@ function IsoGameObject:intersect(other)
   return self.z + self.height > other.z and other.z + other.height > self.z
 end
 
+function IsoGameObject:activate() end
+
+function IsoGameObject:deactivate() end
+
 function IsoGameObject:draw(map)
   local x = self:get_x() + self.w / 2
   local y = self:get_y() + self.h / 2
