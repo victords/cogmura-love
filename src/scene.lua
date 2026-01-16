@@ -1,4 +1,3 @@
-require("src.constants")
 require("src.iso_block")
 require("src.player_character")
 require("src.enemy")
@@ -15,26 +14,25 @@ function Scene.new()
   local self = setmetatable({}, Scene)
   self.index = 1
 
-  self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, 20, 20, Window.reference_width, Window.reference_height, true, false)
+  self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, SCENE_TILE_COUNT, SCENE_TILE_COUNT, Window.reference_width, Window.reference_height, true, false)
+  self.map:set_camera(SCENE_TILE_COUNT / 4 * TILE_WIDTH, SCENE_TILE_COUNT / 4 * TILE_HEIGHT - SCENE_CAMERA_OFFSET)
   self.blocks = {
-    IsoBlock.new(6, 2, 0, 1, 1, 4, false, {1, 0, 0}),
-    IsoBlock.new(1, 3, 0, 7, 1, 1, false, {0, 1, 0}),
-    IsoBlock.new(4, 6, 0, 1, 1, 4, false, {0, 0, 1}),
-    IsoBlock.new(9, 9, 0, 2, 2, 2, false, "sprite/block2"),
-    IsoBlock.new(10, 5, 0, 1, 1, 0.25),
-    IsoBlock.new(10, 4, 0, 1, 1, 0.5),
-    IsoBlock.new(10, 3, 0, 1, 1, 0.75),
-    IsoBlock.new(10, 2, 0, 1, 1, 1),
-    IsoBlock.new(2, 13, 0, 3, 4, 2, true, "sprite/block1", Vector.new(-10, -10)),
-    IsoBlock.new(12, 7, 0, 5, 2, 1, true),
+    IsoBlock.new(16, 12, 0, 1, 1, 4, false, {1, 0, 0}),
+    IsoBlock.new(11, 13, 0, 7, 1, 1, false, {0, 1, 0}),
+    IsoBlock.new(14, 16, 0, 1, 1, 4, false, {0, 0, 1}),
+    IsoBlock.new(20, 15, 0, 1, 1, 0.25),
+    IsoBlock.new(20, 14, 0, 1, 1, 0.5),
+    IsoBlock.new(20, 13, 0, 1, 1, 0.75),
+    IsoBlock.new(20, 12, 0, 1, 1, 1),
+    IsoBlock.new(22, 17, 0, 5, 2, 1, true),
   }
   self.objects = {
-    Enemy.new(1, 13, 15, 0),
-    Enemy.new(1, 13, 16, 0),
-    Item.new(1, 7, 5, 0),
+    Enemy.new(1, 23, 25, 0),
+    Enemy.new(1, 23, 26, 0),
+    Item.new(1, 17, 15, 0),
   }
-  self.player_character = PlayerCharacter.new(5, 5, 0)
-  self.battle_spawn_points = {{3, 16}, {12, 12}, {16, 12}}
+  self.player_character = PlayerCharacter.new(15, 15, 0)
+  self.battle_spawn_points = {{13, 26}, {22, 22}, {26, 22}}
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
@@ -100,4 +98,7 @@ function Scene:draw()
     end
     self.player_character:draw(self.map)
   end
+
+  Window.draw_rectangle(0, 0, UI_Z_INDEX - 1, SCREEN_WIDTH, SCENE_CAMERA_OFFSET, {0, 0, 0})
+  Window.draw_rectangle(0, SCREEN_HEIGHT - SCENE_CAMERA_OFFSET, UI_Z_INDEX - 1, SCREEN_WIDTH, SCENE_CAMERA_OFFSET, {0, 0, 0})
 end

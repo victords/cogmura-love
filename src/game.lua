@@ -1,5 +1,6 @@
 require("lib.index")
 
+require("src.constants")
 require("src.event_manager")
 require("src.in_game_ui")
 require("src.main_menu")
@@ -20,7 +21,7 @@ end
 
 Game = {
   load = function()
-    Window.init(false, 1280, 720, 1920, 1080)
+    Window.init(false, 1280, 720, SCREEN_WIDTH, SCREEN_HEIGHT)
     Physics.gravity.y = 0
     Physics.set_engine("love")
 
