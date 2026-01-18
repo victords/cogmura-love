@@ -1,7 +1,4 @@
-require("src.iso_block")
-require("src.player_character")
-require("src.enemy")
-require("src.item")
+require("src.scene_parser")
 
 Scene = {}
 Scene.__index = Scene
@@ -16,23 +13,10 @@ function Scene.new()
 
   self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, SCENE_TILE_COUNT, SCENE_TILE_COUNT, Window.reference_width, Window.reference_height, true, false)
   self.map:set_camera(SCENE_TILE_COUNT / 4 * TILE_WIDTH, SCENE_TILE_COUNT / 4 * TILE_HEIGHT - SCENE_CAMERA_OFFSET)
-  self.blocks = {
-    IsoBlock.new(16, 12, 0, 1, 1, 4, false, {1, 0, 0}),
-    IsoBlock.new(11, 13, 0, 7, 1, 1, false, {0, 1, 0}),
-    IsoBlock.new(14, 16, 0, 1, 1, 4, false, {0, 0, 1}),
-    IsoBlock.new(20, 15, 0, 1, 1, 0.25),
-    IsoBlock.new(20, 14, 0, 1, 1, 0.5),
-    IsoBlock.new(20, 13, 0, 1, 1, 0.75),
-    IsoBlock.new(20, 12, 0, 1, 1, 1),
-    IsoBlock.new(22, 17, 0, 5, 2, 1, true),
-  }
-  self.objects = {
-    Enemy.new(1, 23, 25, 0),
-    Enemy.new(1, 23, 26, 0),
-    Item.new(1, 17, 15, 0),
-  }
-  self.player_character = PlayerCharacter.new(15, 15, 0)
-  self.battle_spawn_points = {{13, 26}, {22, 22}, {26, 22}}
+  self.blocks = {}
+  self.objects = {}
+  self.tiles = {}
+  SceneParser.new(self):parse()
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
