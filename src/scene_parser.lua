@@ -17,6 +17,22 @@ end
 SceneParser = {}
 SceneParser.__index = SceneParser
 
+local function next_tile(i, j)
+  i = i + 1
+  if i >= SCENE_TILE_COUNT - (j >= HALF_TILE_COUNT and j - HALF_TILE_COUNT or HALF_TILE_COUNT - 1 - j) then
+    j = j + 1
+    i = HALF_TILE_COUNT - (j >= HALF_TILE_COUNT and SCENE_TILE_COUNT - j or j + 1)
+  end
+  return {i, j}
+end
+
+local function fill_tiles(tiles, fill, i, j)
+  while j < SCENE_TILE_COUNT - 1 or (j == SCENE_TILE_COUNT - 1 and i < HALF_TILE_COUNT + 1) do
+    tiles[i + 1][j + 1] = fill
+    i, j = next_tile(i, j)
+  end
+end
+
 function SceneParser.new(scene)
   local self = setmetatable({}, SceneParser)
   self.scene = scene
@@ -26,94 +42,69 @@ end
 function SceneParser:parse()
   local scene = self.scene
   local content = love.filesystem.read("data/scene/" .. scene.index .. ".txt")
-  local info, entrances, exits, spawn_points, objects, tiles = Utils.split(content, "#")
+  local data = Utils.split(content, "#")
 
-  local tileset_id, fill_tile = Utils.split(info, ",")
-  scene.tileset_id = tileset_id
-  scene.tileset = Res.tileset(tileset_id, 1, 7)
-  if fill_tile then scene.fill_tile = tonumber(fill_tile) end
+  local tileset_data = Utils.split(data[1], ",")
+  scene.tileset_id = tileset_data[1]
+  scene.tileset = Res.tileset("tileset/" .. tileset_data[1], 2, 8)
+  if tileset_data[2] then scene.fill_tile = tonumber(tileset_data[2]) end
 
-  local entrance_data = Utils.split(entrances, ";")
+  local entrance_data = Utils.split(data[2], ";")
   scene.entrances = Utils.map(entrance_data, function(e)
     return Utils.map(Utils.split(e, ","), function(d) return tonumber(d) end)
   end)
 
-  local exit_data = Utils.split(exits, ";")
+  local exit_data = Utils.split(data[3], ";")
   scene.exits = Utils.map(exit_data, function(e)
     local args = Utils.map(Utils.split(e, ","), function(d) return tonumber(d) end)
     return Exit.new(unpack(args))
   end)
 
-  local spawn_point_data = Utils.split(spawn_points, ";")
+  local spawn_point_data = Utils.split(data[4], ";")
   scene.spawn_points = Utils.map(spawn_point_data, function(s)
     return Utils.map(Utils.split(s, ","), function(d) return tonumber(d) end)
   end)
 
-  local object_data = Utils.split(objects, ";")
+  local object_data = Utils.split(data[5], ";")
   for _, o in ipairs(object_data) do
-    d = o[1..].split(',')
-    d = d.map(&:to_i) unless o[0] == 'o'
-    case o[0]
-    when 'b' # textured block
-      @blocks << IsoBlock.new(d[0], d[1], d[2], d[3])
-    when 'e'
-      @enemies << Enemy.new(d[0], d[1], d[2], d[3], method(:on_enemy_encounter))
-    when 'i'
-      @items << Item.new(d[0], d[1], d[2], d[3], method(:on_item_picked_up))
-    when 'n'
-      @npcs << Npc.new(d[0], d[1], d[2], d[3])
-    when 'o'
-      obj_class = OBJECT_CLASSES[d[0].to_i]
-      @objects << obj_class.new(d[1].to_i, d[2].to_i, d[3].to_i, d[4..])
-    when 'w' # invisible block
-      @blocks << IsoBlock.new(nil, d[0], d[1], d[4] || 0, d[2], d[3], 999, d[5])
+    local object_type = o:sub(1, 1)
+    local args = Utils.split(o:sub(2), ",")
+    if object_type ~= "o" then
+      args = Utils.map(args, function(a) return tonumber(a) end)
+    end
+    if object_type == "b" then
+      table.insert(scene.blocks, IsoBlock.new(args[1], args[2], args[3], args[4], args[5], args[6], args[7] == nil))
+    elseif object_type == "e" then
+      table.insert(scene.objects, Enemy.new(args[1], args[2], args[3], args[4]))
+    elseif object_type == "i" then
+      table.insert(scene.objects, Item.new(args[1], args[2], args[3], args[4]))
     end
   end
 
-  i = M_S / 2 - 1; j = 0
-  tiles.split(';').each do |d|
-    if d[0] == '_'
-      d[1..].to_i.times { i, j = next_tile(i, j) }
-      next
+  local i = SCENE_TILE_COUNT / 2 - 1
+  local j = 0
+  local tile_data = Utils.split(data[6], ";")
+  for _, d in ipairs(tile_data) do
+    if d:sub(1, 1) == "_" then
+      local n = tonumber(d:sub(2))
+      for k = 1, n do
+        i, j = next_tile(i, j)
+      end
+    else
+      local index = d:find("*", 1, true)
+      local tile_type = tonumber(d:sub(1, index and index - 1 or nil))
+      local num_tiles = index and tonumber(d:sub(index + 1)) or 1
+      for k = 1, num_tiles do
+        scene.tiles[i + 1][j + 1] = tile_type
+        i, j = next_tile(i, j)
+      end
     end
-
-    tile_type = d.to_i
-    index = d.index('*')
-    num_tiles = index ? d[(index + 1)..].to_i : 1
-    num_tiles.times do
-      @tiles[i][j] = tile_type
-      i, j = next_tile(i, j)
-    end
   end
 
-  fill_tiles(@fill_tile, i, j) if @fill_tile
-end
-
-def fill_tiles(fill, i, j)
-  while j < M_S - 1 || j == M_S - 1 && i < M_S / 2 + 1
-    @tiles[i][j] = fill.to_i
-    i, j = next_tile(i, j)
+  if tileset_data[2] then
+    fill_tiles(scene.tiles, scene.fill_tile, i, j)
   end
-end
 
-def init_player(entrance_index)
-  entrance = @entrances[entrance_index]
-  @man = Character.new(entrance.col, entrance.row, entrance.layer)
-  @man.on_exit = method(:on_player_leave)
-end
-
-def init_transition
-  @fading = :in
-  @overlay_alpha = 255
-end
-
-private
-
-def next_tile(i, j)
-  i += 1
-  if i >= M_S - (j >= M_S / 2 ? j - M_S / 2 : M_S / 2 - 1 - j)
-    j += 1
-    i = M_S / 2 - (j >= M_S / 2 ? M_S - j : j + 1)
-  end
-  [i, j]
+  local entrance = scene.entrances[1]
+  scene.player_character = PlayerCharacter.new(entrance[1], entrance[2], entrance[3])
 end

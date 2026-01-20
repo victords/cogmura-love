@@ -16,6 +16,9 @@ function Scene.new()
   self.blocks = {}
   self.objects = {}
   self.tiles = {}
+  for i = 1, SCENE_TILE_COUNT do
+    table.insert(self.tiles, {})
+  end
   SceneParser.new(self):parse()
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
