@@ -1,18 +1,46 @@
 IsoBlock = {}
 IsoBlock.__index = IsoBlock
 
-function IsoBlock.new(col, row, layer, cols, rows, layers, diagonal, color_or_image, img_gap)
+TYPE_MAP = {
+  {1, 1, 1, "block1", 0, 0},            -- 0
+  {4, 6, 7, "house1", -10, -40},        -- 1
+  {3, 3, 7, "house2", -10, -64},        -- 2
+  {1, 1, 15, "tree1", -128, 0},         -- 3
+  {3, 2, 2, "bed1", 0, -16},            -- 4
+  {1, 1, 7, "bedtable1", 0, 48},        -- 5
+  {1, 10, 7, "wall1", 0, -32},          -- 6
+  {6, 1, 7, "wall2", 0, -32},           -- 7
+  {4, 1, 7, "wall3", 0, 0},             -- 8
+  {1, 1, 7, "wall4", 0, 0},             -- 9
+  {1, 2, 7, "rack1", -4, 96},           -- 10
+  {2, 2, 2, "table1", 0, 0},            -- 11
+  {3, 4, 7, "house3", -10, -94},        -- 12
+  {6, 2, 12, "house4", -10, -40, true}, -- 13
+  {2, 1, 1, "balcony1", 0, 0, true},    -- 14
+  {2, 1, 10, "fence1", 0, 128, true},   -- 15
+  {4, 3, 7, "house5", -10, -94},        -- 16
+}
+
+function IsoBlock.new(type_id, col, row, layer, cols, rows, layers, diagonal, color_or_image, img_gap)
   local self = setmetatable({}, IsoBlock)
   self.col = col
   self.row = row
   self.layer = layer
+  if type_id then
+    local attrs = TYPE_MAP[type_id]
+    cols = attrs[1]
+    rows = attrs[2]
+    layers = attrs[3]
+    color_or_image = "block/" .. attrs[4]
+    img_gap = Vector.new(attrs[5], attrs[6])
+    diagonal = attrs[7]
+  end
   self.cols = cols
   self.rows = rows
   self.layers = layers
   self.z = layer * PHYSICS_UNIT
   self.height = layers * PHYSICS_UNIT
   self.top = self.z + self.height
-  self.diagonal = diagonal
 
   if diagonal then
     self.ramps = {}

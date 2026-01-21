@@ -18,6 +18,9 @@ function Scene.new()
   self.tiles = {}
   for i = 1, SCENE_TILE_COUNT do
     table.insert(self.tiles, {})
+    for j = 1, SCENE_TILE_COUNT do
+      table.insert(self.tiles[i], 0)
+    end
   end
   SceneParser.new(self):parse()
 
@@ -71,8 +74,10 @@ end
 
 function Scene:draw()
   self.map:foreach(function(i, j, x, y)
-    local color = (i + j) % 2 == 0 and {0.15, 0.6, 0} or {0.3, 0.8, 0}
-    draw_tile(color, x, y)
+    local tile_index = self.tiles[i + 1][j + 1]
+    if tile_index > 0 then
+      self.tileset[tile_index]:draw(x, y)
+    end
   end)
 
   for _, block in ipairs(self.blocks) do

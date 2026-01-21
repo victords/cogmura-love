@@ -23,7 +23,7 @@ local function next_tile(i, j)
     j = j + 1
     i = HALF_TILE_COUNT - (j >= HALF_TILE_COUNT and SCENE_TILE_COUNT - j or j + 1)
   end
-  return {i, j}
+  return i, j
 end
 
 local function fill_tiles(tiles, fill, i, j)
@@ -47,7 +47,7 @@ function SceneParser:parse()
   local tileset_data = Utils.split(data[1], ",")
   scene.tileset_id = tileset_data[1]
   scene.tileset = Res.tileset("tileset/" .. tileset_data[1], 2, 8)
-  if tileset_data[2] then scene.fill_tile = tonumber(tileset_data[2]) end
+  if tileset_data[2] then scene.fill_tile = tonumber(tileset_data[2]) + 1 end
 
   local entrance_data = Utils.split(data[2], ";")
   scene.entrances = Utils.map(entrance_data, function(e)
@@ -73,11 +73,13 @@ function SceneParser:parse()
       args = Utils.map(args, function(a) return tonumber(a) end)
     end
     if object_type == "b" then
-      table.insert(scene.blocks, IsoBlock.new(args[1], args[2], args[3], args[4], args[5], args[6], args[7] == nil))
+      table.insert(scene.blocks, IsoBlock.new(args[1], args[2], args[3], args[4]))
     elseif object_type == "e" then
       table.insert(scene.objects, Enemy.new(args[1], args[2], args[3], args[4]))
     elseif object_type == "i" then
       table.insert(scene.objects, Item.new(args[1], args[2], args[3], args[4]))
+    elseif object_type == "w" then
+      table.insert(scene.blocks, IsoBlock.new(nil, args[1], args[2], args[3], args[4], args[5], args[6], args[7] == nil))
     end
   end
 
@@ -95,7 +97,7 @@ function SceneParser:parse()
       local tile_type = tonumber(d:sub(1, index and index - 1 or nil))
       local num_tiles = index and tonumber(d:sub(index + 1)) or 1
       for k = 1, num_tiles do
-        scene.tiles[i + 1][j + 1] = tile_type
+        scene.tiles[i + 1][j + 1] = tile_type + 1
         i, j = next_tile(i, j)
       end
     end
