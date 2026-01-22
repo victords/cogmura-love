@@ -73,13 +73,13 @@ function SceneParser:parse()
       args = Utils.map(args, function(a) return tonumber(a) end)
     end
     if object_type == "b" then
-      table.insert(scene.blocks, IsoBlock.new(args[1], args[2], args[3], args[4]))
+      table.insert(scene.blocks, IsoBlock.new(args[1] + 1, args[2], args[3], args[4]))
     elseif object_type == "e" then
       table.insert(scene.objects, Enemy.new(args[1], args[2], args[3], args[4]))
     elseif object_type == "i" then
       table.insert(scene.objects, Item.new(args[1], args[2], args[3], args[4]))
     elseif object_type == "w" then
-      table.insert(scene.blocks, IsoBlock.new(nil, args[1], args[2], args[3], args[4], args[5], args[6], args[7] == nil))
+      table.insert(scene.blocks, IsoBlock.new(nil, args[1], args[2], args[3], args[4], args[5], args[6], args[7] ~= nil))
     end
   end
 

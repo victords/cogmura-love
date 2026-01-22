@@ -8,7 +8,7 @@ DIAGONAL_SPEED = BASE_SPEED * math.sqrt(2) * 0.5
 JUMP_SPEED = 10 -- per frame
 
 function PlayerCharacter.new(col, row, layer)
-  local self = IsoGameObject.new(col, row, layer, 20, 20, PHYSICS_UNIT, "sprite/player", nil, nil, nil, {shape = "circle"})
+  local self = IsoGameObject.new(col, row, layer, 20, 20, PHYSICS_UNIT, "sprite/player", Vector.new(0, -32), nil, nil, {shape = "circle"})
   setmetatable(self, PlayerCharacter)
   self.speed_z = 0
   self.inner_size = self.w * math.sqrt(2) * 0.5

@@ -78,6 +78,9 @@ function Scene:draw()
     if tile_index > 0 then
       self.tileset[tile_index]:draw(x, y)
     end
+    if (i + j) % 2 == 0 then
+      Window.draw_polygon(UI_Z_INDEX, {0, 0, 0, 0.2}, "fill", x + HALF_TILE_WIDTH, y, x + TILE_WIDTH, y + HALF_TILE_HEIGHT, x + HALF_TILE_WIDTH, y + TILE_HEIGHT, x, y + HALF_TILE_HEIGHT)
+    end
   end)
 
   for _, block in ipairs(self.blocks) do

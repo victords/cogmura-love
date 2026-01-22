@@ -79,7 +79,21 @@ function IsoBlock.new(type_id, col, row, layer, cols, rows, layers, diagonal, co
     if diagonal then
       self.image = Res.img(color_or_image)
     else
-      self.image = Res.tileset(color_or_image, cols + rows, 1)
+      self.image = {}
+      local base_image = Res.img(color_or_image)
+      for i = 0, self.cols + self.rows - 1 do
+        local x = i * HALF_TILE_WIDTH
+        local w = HALF_TILE_WIDTH
+        if i == 0 then
+          w = w - img_gap.x
+        elseif i == self.cols + self.rows - 1 then
+          x = x - img_gap.x
+          w = base_image.width - ((self.cols + self.rows - 1) * HALF_TILE_WIDTH - img_gap.x)
+        else
+          x = x - img_gap.x
+        end
+        table.insert(self.image, Image.new(base_image.source, x, 0, w, base_image.height))
+      end
     end
   else
     self.color = color_or_image or {1, 1, 1}
@@ -117,7 +131,7 @@ end
 function IsoBlock:draw(map)
   if self.image then
     local base_pos = map:get_screen_pos(self.col, self.row)
-    local y = base_pos.y - (self.layer + self.layers) * ISO_UNIT
+    local y = base_pos.y - (self.layer + self.layers) * ISO_UNIT + self.img_gap.y
 
     if self.diagonal then
       self.image:draw(base_pos.x + self.img_gap.x, y + self.img_gap.y, self.max_z_index)
@@ -127,11 +141,12 @@ function IsoBlock:draw(map)
 
     local base_x = base_pos.x - (self.rows - 1) * HALF_TILE_WIDTH
     for i = 0, self.cols + self.rows - 1 do
+      local x_offset = i == 0 and self.img_gap.x or 0
       local j = i + 1
       local z_ref = j > self.cols and i or j
       local z = (self.col + self.row + self.rows + (z_ref > self.cols and self.cols or z_ref) - (z_ref > self.cols and (z_ref - self.cols) or 0)) * 10000
       z = z + (self.layer + self.layers) * 100
-      self.image[i + 1]:draw(base_x + i * HALF_TILE_WIDTH, y, z)
+      self.image[i + 1]:draw(base_x + i * HALF_TILE_WIDTH + x_offset, y, z)
     end
 
     return
