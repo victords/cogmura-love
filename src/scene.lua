@@ -13,7 +13,12 @@ function Scene.new()
 
   self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, SCENE_TILE_COUNT, SCENE_TILE_COUNT, Window.reference_width, Window.reference_height, true, false)
   self.map:set_camera(SCENE_TILE_COUNT / 4 * TILE_WIDTH, SCENE_TILE_COUNT / 4 * TILE_HEIGHT - SCENE_CAMERA_OFFSET)
-  self.blocks = {}
+  self.blocks = {
+    IsoBlock.new(nil, 0, HALF_TILE_COUNT - 1, 0, HALF_TILE_COUNT, 1, 99, true),
+    IsoBlock.new(nil, -0.5, HALF_TILE_COUNT + 0.5, 0, 1, HALF_TILE_COUNT, 99, true),
+    IsoBlock.new(nil, HALF_TILE_COUNT + 0.5, SCENE_TILE_COUNT - 0.5, 0, HALF_TILE_COUNT, 1, 99, true),
+    IsoBlock.new(nil, HALF_TILE_COUNT + 0.5, -0.5, 0, 1, HALF_TILE_COUNT, 99, true),
+  }
   self.objects = {}
   self.tiles = {}
   for i = 1, SCENE_TILE_COUNT do

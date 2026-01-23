@@ -38,6 +38,7 @@ function IsoBlock.new(type_id, col, row, layer, cols, rows, layers, diagonal, co
   self.cols = cols
   self.rows = rows
   self.layers = layers
+  self.diagonal = diagonal
   self.z = layer * PHYSICS_UNIT
   self.height = layers * PHYSICS_UNIT
   self.top = self.z + self.height
@@ -95,8 +96,8 @@ function IsoBlock.new(type_id, col, row, layer, cols, rows, layers, diagonal, co
         table.insert(self.image, Image.new(base_image.source, x, 0, w, base_image.height))
       end
     end
-  else
-    self.color = color_or_image or {1, 1, 1}
+  elseif type(color_or_image) == "table" then
+    self.color = color_or_image
     self.shade_color1 = {0.9 * self.color[1], 0.9 * self.color[2], 0.9 * self.color[3]}
     self.shade_color2 = {0.8 * self.color[1], 0.8 * self.color[2], 0.8 * self.color[3]}
   end
@@ -151,6 +152,8 @@ function IsoBlock:draw(map)
 
     return
   end
+
+  if self.color == nil then return end
 
   if self.diagonal then
     local base_pos = map:get_screen_pos(self.col + self.rows - 1, self.row + self.rows - 1)
