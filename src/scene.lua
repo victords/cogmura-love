@@ -7,9 +7,9 @@ local function draw_tile(color, x, y)
   Window.draw_polygon(1, color, "fill", x + HALF_TILE_WIDTH, y, x + TILE_WIDTH, y + HALF_TILE_HEIGHT, x + HALF_TILE_WIDTH, y + TILE_HEIGHT, x, y + HALF_TILE_HEIGHT)
 end
 
-function Scene.new()
+function Scene.new(index, entrance_index)
   local self = setmetatable({}, Scene)
-  self.index = 1
+  self.index = index
 
   self.map = Map.new(TILE_WIDTH, TILE_HEIGHT, SCENE_TILE_COUNT, SCENE_TILE_COUNT, Window.reference_width, Window.reference_height, true, false)
   self.map:set_camera(SCENE_TILE_COUNT / 4 * TILE_WIDTH, SCENE_TILE_COUNT / 4 * TILE_HEIGHT - SCENE_CAMERA_OFFSET)
@@ -28,6 +28,10 @@ function Scene.new()
     end
   end
   SceneParser.new(self):parse()
+
+  entrance_index = entrance_index or 1
+  local entrance = self.entrances[entrance_index]
+  self.player_character = PlayerCharacter.new(entrance[1], entrance[2], entrance[3])
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
@@ -67,10 +71,19 @@ end
 function Scene:update()
   if self.in_battle then return end
 
-  self.player_character:update(self.blocks)
+  local player = self.player_character
+
+  for _, exit in ipairs(self.exits) do
+    if exit:intersect(player:bounds()) and exit.layer == player:get_layer() then
+      EventManager.trigger("scene_exit", exit.dest_scene, exit.dest_entrance)
+      return
+    end
+  end
+
+  player:update(self.blocks)
   for i = #self.objects, 1, -1 do
     local object = self.objects[i]
-    object:update(self.player_character)
+    object:update(player)
     if object.destroyed then
       table.remove(self.objects, i)
     end

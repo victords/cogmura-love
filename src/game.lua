@@ -33,6 +33,7 @@ Game = {
     EventManager.listen("game_start", Game.on_start)
     EventManager.listen("battle_start", Game.on_battle_start)
     EventManager.listen("battle_finish", Game.on_battle_finish)
+    EventManager.listen("scene_exit", Game.on_scene_exit)
 
     math.randomseed(os.time())
   end,
@@ -62,7 +63,7 @@ Game = {
     print("gamepad " .. (enabled and "enabled" or "disabled"))
   end,
   on_start = function()
-    Game.scene = Scene.new()
+    Game.scene = Scene.new(1)
     Game.controllers = {
       Game.scene,
       InGameUi.new(Game.player_stats)
@@ -74,5 +75,10 @@ Game = {
   end,
   on_battle_finish = function()
     remove_controllers(Battle)
+  end,
+  on_scene_exit = function(dest_scene, dest_entrance)
+    remove_controllers(Scene)
+    Game.scene = Scene.new(dest_scene, dest_entrance)
+    table.insert(Game.controllers, Game.scene)
   end
 }

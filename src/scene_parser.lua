@@ -11,6 +11,7 @@ function Exit.new(dest_scene, dest_entrance, col, row, layer)
   setmetatable(self, Exit)
   self.dest_scene = dest_scene
   self.dest_entrance = dest_entrance
+  self.layer = layer
   return self
 end
 
@@ -106,7 +107,4 @@ function SceneParser:parse()
   if tileset_data[2] then
     fill_tiles(scene.tiles, scene.fill_tile, i, j)
   end
-
-  local entrance = scene.entrances[1]
-  scene.player_character = PlayerCharacter.new(entrance[1], entrance[2], entrance[3])
 end

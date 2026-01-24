@@ -23,6 +23,10 @@ function IsoGameObject:intersect(other)
   return self.z + self.height > other.z and other.z + other.height > self.z
 end
 
+function IsoGameObject:get_layer()
+  return math.floor(self.z / PHYSICS_UNIT)
+end
+
 function IsoGameObject:activate() end
 
 function IsoGameObject:deactivate() end
