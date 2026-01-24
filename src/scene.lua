@@ -32,10 +32,12 @@ function Scene.new(index, entrance_index)
   entrance_index = entrance_index or 1
   local entrance = self.entrances[entrance_index]
   self.player_character = PlayerCharacter.new(entrance[1], entrance[2], entrance[3])
+  self.fading = true
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
   EventManager.listen("battle_finish", Scene.on_battle_finish, self)
+  EventManager.listen("fade_finish", function() self.fading = false end)
 
   return self
 end
@@ -69,7 +71,7 @@ function Scene:on_battle_finish()
 end
 
 function Scene:update()
-  if self.in_battle then return end
+  if self.in_battle or self.fading then return end
 
   local player = self.player_character
 

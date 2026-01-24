@@ -8,6 +8,8 @@ require("src.player_stats")
 require("src.scene")
 require("src.battle")
 
+FADE_DURATION = 20
+
 local function remove_controllers(...)
   local classes = {...}
   for i = #Game.controllers, 1, -1 do
@@ -38,6 +40,21 @@ Game = {
     math.randomseed(os.time())
   end,
   update = function(dt)
+    if Game.fade_timer then
+      Game.fade_timer = Game.fade_timer + 1
+      if Game.fade_timer == FADE_DURATION then
+        if Game.on_fade_out_finish then
+          Game.on_fade_out_finish()
+          Game.on_fade_out_finish = nil
+          Game.fade_timer = 0
+        else
+          EventManager.trigger("fade_finish")
+          Game.fade_timer = nil
+        end
+      end
+      return
+    end
+
     KB.update()
     Mouse.update()
     Physics.update(dt)
@@ -57,6 +74,14 @@ Game = {
       for _, controller in ipairs(Game.controllers) do
         controller:draw()
       end
+
+      if Game.fade_timer then
+        local alpha = Game.fade_timer / FADE_DURATION
+        if Game.on_fade_out_finish == nil then
+          alpha = 1 - alpha
+        end
+        Window.draw_rectangle(0, 0, UI_Z_INDEX + 1, SCREEN_WIDTH, SCREEN_HEIGHT, {0, 0, 0, alpha})
+      end
     end)
   end,
   toggle_gamepad = function(enabled)
@@ -68,6 +93,7 @@ Game = {
       Game.scene,
       InGameUi.new(Game.player_stats)
     }
+    Game.fade_timer = 0
   end,
   on_battle_start = function(initiator)
     local battle = Battle.new(Game.player_stats, Game.scene.map, Game.scene.battle_spawn_points, initiator)
@@ -77,8 +103,11 @@ Game = {
     remove_controllers(Battle)
   end,
   on_scene_exit = function(dest_scene, dest_entrance)
-    remove_controllers(Scene)
-    Game.scene = Scene.new(dest_scene, dest_entrance)
-    table.insert(Game.controllers, Game.scene)
+    Game.on_fade_out_finish = function()
+      remove_controllers(Scene)
+      Game.scene = Scene.new(dest_scene, dest_entrance)
+      table.insert(Game.controllers, Game.scene)
+    end
+    Game.fade_timer = 0
   end
 }
