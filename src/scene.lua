@@ -33,6 +33,7 @@ function Scene.new(index, entrance_index)
   local entrance = self.entrances[entrance_index]
   self.player_character = PlayerCharacter.new(entrance[1], entrance[2], entrance[3])
   self.fading = true
+  self.active = true
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
@@ -42,32 +43,52 @@ function Scene.new(index, entrance_index)
   return self
 end
 
+function Scene:activate(entrance_index)
+  if entrance_index then
+    local entrance = self.entrances[entrance_index]
+    self.player_character:move_to(entrance[1], entrance[2], entrance[3])
+  end
+  self.player_character:activate()
+  for _, o in ipairs(self.objects) do
+    o:activate()
+  end
+  for _, b in ipairs(self.blocks) do
+    b:activate()
+  end
+  self.active = true
+end
+
+function Scene:deactivate()
+  self.player_character:deactivate()
+  for _, o in ipairs(self.objects) do
+    o:deactivate()
+  end
+  for _, b in ipairs(self.blocks) do
+    b:deactivate()
+  end
+  self.active = false
+end
+
 function Scene:prepare_obstacles(player_z, player_height)
+  if not self.active then return end
+
   for _, block in ipairs(self.blocks) do
     block:set_body_active(block.top > player_z + STEP_THRESHOLD and player_z + player_height > block.z)
   end
 end
 
 function Scene:on_battle_start()
+  if not self.active then return end
+
   self.in_battle = true
-  self.player_character:deactivate()
-  for _, object in ipairs(self.objects) do
-    object:deactivate()
-  end
-  for _, block in ipairs(self.blocks) do
-    block:set_body_active(false)
-  end
+  self:deactivate()
 end
 
 function Scene:on_battle_finish()
+  if not self.active then return end
+
   self.in_battle = false
-  self.player_character:activate()
-  for _, object in ipairs(self.objects) do
-    object:activate()
-  end
-  for _, block in ipairs(self.blocks) do
-    block:set_body_active(true)
-  end
+  self:activate()
 end
 
 function Scene:update()

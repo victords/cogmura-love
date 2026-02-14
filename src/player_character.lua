@@ -17,6 +17,11 @@ function PlayerCharacter.new(col, row, layer)
   return self
 end
 
+function PlayerCharacter:move_to(col, row, layer)
+  self.body:setPosition((col + 0.5) * PHYSICS_UNIT, (row + 0.5) * PHYSICS_UNIT)
+  self.z = layer * PHYSICS_UNIT
+end
+
 function PlayerCharacter:activate()
   self.body:setActive(true)
 end

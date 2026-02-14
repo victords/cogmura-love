@@ -28,6 +28,7 @@ Game = {
     Physics.set_engine("love")
 
     Game.player_stats = PlayerStats.load("10,5,1,0,0,0")
+    Game.scene_cache = {}
     Game.controllers = {
       MainMenu.new(),
     }
@@ -89,6 +90,7 @@ Game = {
   end,
   on_start = function()
     Game.scene = Scene.new(1)
+    table.insert(Game.scene_cache, Game.scene)
     Game.controllers = {
       Game.scene,
       InGameUi.new(Game.player_stats)
@@ -104,8 +106,20 @@ Game = {
   end,
   on_scene_exit = function(dest_scene, dest_entrance)
     Game.on_fade_out_finish = function()
+      Game.scene:deactivate()
       remove_controllers(Scene)
-      Game.scene = Scene.new(dest_scene, dest_entrance)
+      local scene = Utils.find(Game.scene_cache, function(s) return s.index == dest_scene end)
+      if scene then
+        scene:activate(dest_entrance)
+        Game.scene = scene
+      else
+        Game.scene = Scene.new(dest_scene, dest_entrance)
+        table.insert(Game.scene_cache, Game.scene)
+        if #Game.scene_cache > 3 then
+          Game.scene_cache[1]:clean()
+          table.remove(Game.scene_cache, 1)
+        end
+      end
       table.insert(Game.controllers, Game.scene)
     end
     Game.fade_timer = 0

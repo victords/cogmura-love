@@ -129,6 +129,12 @@ Utils = {
     end
     return filtered
   end,
+  find = function(tb, filter)
+    for _, v in ipairs(tb) do
+      if filter(v) then return v end
+    end
+    return nil
+  end,
   remove = function(tb, element)
     for i = #tb, 1, -1 do
       if tb[i] == element then

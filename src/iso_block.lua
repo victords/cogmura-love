@@ -2,23 +2,23 @@ IsoBlock = {}
 IsoBlock.__index = IsoBlock
 
 TYPE_MAP = {
-  {1, 1, 1, "block1", 0, 0},            -- 0
-  {4, 6, 3, "house1", -10, -48},        -- 1
-  {3, 3, 4, "house2", -10, 0},          -- 2
-  {1, 1, 7, "tree1", -128, 32},         -- 3
-  {3, 2, 1, "bed1", 0, -8},             -- 4
-  {1, 1, 3, "bedtable1", 0, 40},        -- 5
-  {1, 10, 3, "wall1", 0, -40},          -- 6
-  {6, 1, 3, "wall2", 0, -40},           -- 7
-  {4, 1, 3, "wall3", 0, -8},            -- 8
-  {1, 1, 3, "wall4", 0, -8},            -- 9
-  {1, 2, 3, "rack1", -4, 88},           -- 10
-  {2, 2, 1, "table1", 0, 8},            -- 11
-  {3, 4, 4, "house3", -10, -30},        -- 12
-  {6, 2, 5, "house4", -10, -64, true},  -- 13
-  {2, 1, 1, "balcony1", 0, 40, true},   -- 14
-  {2, 1, 3, "fence1", 0, 24, true},     -- 15
-  {4, 3, 4, "house5", -10, -30},        -- 16
+  {1, 1, 1, "block1", 0, 0},           -- 1
+  {4, 6, 3, "house1", -10, -48},       -- 2
+  {3, 3, 4, "house2", -10, 0},         -- 3
+  {1, 1, 7, "tree1", -128, 32},        -- 4
+  {3, 2, 1, "bed1", 0, -8},            -- 5
+  {1, 1, 3, "bedtable1", 0, 40},       -- 6
+  {1, 10, 3, "wall1", 0, -40},         -- 7
+  {6, 1, 3, "wall2", 0, -40},          -- 8
+  {4, 1, 3, "wall3", 0, -8},           -- 9
+  {1, 1, 3, "wall4", 0, -8},           -- 10
+  {1, 2, 3, "rack1", -4, 88},          -- 11
+  {2, 2, 1, "table1", 0, 8},           -- 12
+  {3, 4, 4, "house3", -10, -30},       -- 13
+  {6, 2, 5, "house4", -10, -64, true}, -- 14
+  {2, 1, 1, "balcony1", 0, 40, true},  -- 15
+  {2, 1, 3, "fence1", 0, 24, true},    -- 16
+  {4, 3, 4, "house5", -10, -30},       -- 17
 }
 
 function IsoBlock.new(type_id, col, row, layer, cols, rows, layers, diagonal, color_or_image, img_gap)
@@ -113,6 +113,14 @@ function IsoBlock:set_body_active(active)
   else
     self.body:setActive(active)
   end
+end
+
+function IsoBlock:activate()
+  self:set_body_active(true)
+end
+
+function IsoBlock:deactivate()
+  self:set_body_active(false)
 end
 
 function IsoBlock:intersect(rect)
