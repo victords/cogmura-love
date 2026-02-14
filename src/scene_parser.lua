@@ -62,7 +62,7 @@ function SceneParser:parse()
   end)
 
   local spawn_point_data = Utils.split(data[4], ";")
-  scene.spawn_points = Utils.map(spawn_point_data, function(s)
+  scene.battle_spawn_points = Utils.map(spawn_point_data, function(s)
     return Utils.map(Utils.split(s, ","), function(d) return tonumber(d) end)
   end)
 

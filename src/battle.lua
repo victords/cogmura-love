@@ -41,6 +41,12 @@ function Battle.new(player_stats, map, spawn_points, initiator)
 end
 
 function Battle:set_next_combatant()
+  if #self.enemies == 0 then
+    self.player:clean()
+    EventManager.trigger("battle_finish", "victory")
+    return
+  end
+
   self.combatant_index = self.combatant_index + 1
   if self.combatant_index > #self.combatants then self.combatant_index = 1 end
   self.active_combatant = self.combatants[self.combatant_index]
@@ -50,10 +56,7 @@ end
 function Battle:on_enemy_defeat(enemy)
   Utils.remove(self.combatants, enemy)
   Utils.remove(self.enemies, enemy)
-
-  if #self.enemies == 0 then
-    EventManager.trigger("battle_finish", "victory")
-  end
+  enemy:clean()
 end
 
 function Battle:get_available_targets(action)

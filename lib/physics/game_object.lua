@@ -428,6 +428,12 @@ function GameObject:is_in_contact_with(obj)
   return self.left == obj or self.right == obj or self.top == obj or self.bottom == obj
 end
 
+function GameObject:clean()
+  if self.body then
+    self.body:destroy()
+  end
+end
+
 -- private
 function GameObject:check_contact(obst, ramps)
   local prev_bottom = self.bottom
