@@ -106,7 +106,7 @@ Game = {
   end,
   on_scene_exit = function(dest_scene, dest_entrance)
     Game.on_fade_out_finish = function()
-      Game.scene:deactivate()
+      Game.scene:deactivate(true)
       remove_controllers(Scene)
       local scene = Utils.find(Game.scene_cache, function(s) return s.index == dest_scene end)
       if scene then

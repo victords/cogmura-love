@@ -33,7 +33,7 @@ function Scene.new(index, entrance_index)
   local entrance = self.entrances[entrance_index]
   self.player_character = PlayerCharacter.new(entrance[1], entrance[2], entrance[3])
   self.fading = true
-  self.active = true
+  self.state = "current"
 
   EventManager.listen("player_move_start", Scene.prepare_obstacles, self)
   EventManager.listen("battle_start", Scene.on_battle_start, self)
@@ -55,10 +55,10 @@ function Scene:activate(entrance_index)
   for _, b in ipairs(self.blocks) do
     b:activate()
   end
-  self.active = true
+  self.state = "current"
 end
 
-function Scene:deactivate()
+function Scene:deactivate(exited)
   self.player_character:deactivate()
   for _, o in ipairs(self.objects) do
     o:deactivate()
@@ -66,7 +66,7 @@ function Scene:deactivate()
   for _, b in ipairs(self.blocks) do
     b:deactivate()
   end
-  self.active = false
+  self.state = exited and "inactive" or "in_battle"
 end
 
 function Scene:prepare_obstacles(player_z, player_height)
@@ -77,22 +77,23 @@ function Scene:prepare_obstacles(player_z, player_height)
   end
 end
 
-function Scene:on_battle_start()
-  if not self.active then return end
+function Scene:on_battle_start(initiator)
+  if self.state ~= "current" then return end
 
-  self.in_battle = true
-  self:deactivate()
+  self.battle_initiator = initiator
+  self:deactivate(false)
 end
 
 function Scene:on_battle_finish()
-  if not self.active then return end
+  if self.state ~= "in_battle" then return end
 
-  self.in_battle = false
+  Utils.remove(self.objects, self.battle_initiator)
+  self.battle_initiator = nil
   self:activate()
 end
 
 function Scene:update()
-  if self.in_battle or self.fading then return end
+  if self.state ~= "current" or self.fading then return end
 
   local player = self.player_character
 
@@ -114,6 +115,8 @@ function Scene:update()
 end
 
 function Scene:draw()
+  if self.state == "inactive" then return end
+
   self.map:foreach(function(i, j, x, y)
     local tile_index = self.tiles[i + 1][j + 1]
     if tile_index > 0 then
@@ -128,7 +131,7 @@ function Scene:draw()
     block:draw(self.map)
   end
 
-  if not self.in_battle then
+  if self.state == "current" then
     for _, object in ipairs(self.objects) do
       object:draw(self.map)
     end
