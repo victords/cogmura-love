@@ -10,6 +10,21 @@ local function add_to_layer(z, args)
   table.insert(Window.layers[z], args)
 end
 
+local function draw(args)
+  local func = args[1]
+  local color = args[2]
+  local args_index = 3
+  if func == "draw_canvas" then
+    func = "draw"
+    love.graphics.setShader(args[3])
+    args_index = 4
+  end
+  if color then love.graphics.setColor(color) end
+  love.graphics[func](unpack(args, args_index))
+  if color then love.graphics.setColor(1, 1, 1) end
+  if args_index == 4 then love.graphics.setShader() end
+end
+
 function Window.init(fullscreen, width, height, reference_width, reference_height, is_update)
   width = width or 1280
   height = height or 720
@@ -75,6 +90,11 @@ function Window.on_toggle(handler, obj)
   table.insert(Window.toggle_handlers, {handler, obj})
 end
 
+function Window.set_canvas(canvas)
+  Window.custom_canvas = canvas
+  love.graphics.setCanvas(canvas or Window.canvas)
+end
+
 function Window.set_shader(path)
   Window.shader = Res.shader(path)
   if Window.canvas == nil then
@@ -84,17 +104,32 @@ end
 
 function Window.draw_rectangle(x, y, z, w, h, color, mode)
   mode = mode or "fill"
-  add_to_layer(z, {"rectangle", color, mode, x, y, w, h})
+  local args = {"rectangle", color, mode, x, y, w, h}
+  if Window.custom_canvas then
+    draw(args)
+  else
+    add_to_layer(z, args)
+  end
 end
 
 function Window.draw_polygon(z, color, mode, ...)
   mode = mode or "fill"
-  add_to_layer(z, {"polygon", color, mode, ...})
+  local args = {"polygon", color, mode, ...}
+  if Window.custom_canvas then
+    draw(args)
+  else
+    add_to_layer(z, args)
+  end
 end
 
 function Window.draw_circle(x, y, z, radius, color, mode)
   mode = mode or "fill"
-  add_to_layer(z, {"circle", color, mode, x, y, radius})
+  local args = {"circle", color, mode, x, y, radius}
+  if Window.custom_canvas then
+    draw(args)
+  else
+    add_to_layer(z, args)
+  end
 end
 
 function Window.draw_image(image, x, y, z, color, scale_x, scale_y, angle, origin_x, origin_y, quad)
@@ -102,15 +137,24 @@ function Window.draw_image(image, x, y, z, color, scale_x, scale_y, angle, origi
   local args = quad and
     {"draw", color, image, quad, x, y, angle, scale_x, scale_y, origin_x, origin_y} or
     {"draw", color, image, x, y, angle, scale_x, scale_y, origin_x, origin_y}
-  add_to_layer(z, args)
+  if Window.custom_canvas then
+    draw(args)
+  else
+    add_to_layer(z, args)
+  end
 end
 
 function Window.draw_text(text, font, x, y, z, color, scale_x, scale_y, angle, origin_x, origin_y)
-  add_to_layer(z, {"print", color, text, font, x, y, angle, scale_x, scale_y, origin_x, origin_y})
+  local args = {"print", color, text, font, x, y, angle, scale_x, scale_y, origin_x, origin_y}
+  if Window.custom_canvas then
+    draw(args)
+  else
+    add_to_layer(z, args)
+  end
 end
 
-function Window.draw_canvas(canvas, x, y, z, color)
-  add_to_layer(z, {"draw", color, canvas, x, y})
+function Window.draw_canvas(canvas, x, y, z, color, scale_x, scale_y, shader)
+  add_to_layer(z, {"draw_canvas", color, shader, canvas, x, y, nil, scale_x, scale_y})
 end
 
 function Window.draw(draw_code)
@@ -130,11 +174,8 @@ function Window.draw(draw_code)
 
   for _, index in ipairs(indexes) do
     layer = Window.layers[index]
-    for _, object in ipairs(layer) do
-      local color = object[2]
-      if color then love.graphics.setColor(color) end
-      love.graphics[object[1]](unpack(object, 3))
-      if color then love.graphics.setColor(1, 1, 1) end
+    for _, args in ipairs(layer) do
+      draw(args)
     end
   end
 
